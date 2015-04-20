@@ -6,46 +6,107 @@ var fs = require('fs'),
     shell = require('shelljs'),
 	argv = require('minimist')(process.argv.slice(2)),
 	chakiCommand = argv._[0],
-	appJsonPath = argv._[1] || 'app.json',
-	appDir = path.dirname(appJsonPath),
-	appJson,
-	packagesPath;
+	appJsonPath = path.resolve(argv._[1] || './app.json'),
+	appDir = path.dirname(appJsonPath);
 
 
-
-// load app.json into string
-appJson = fs.readFileSync(appJsonPath, {encoding: 'utf8'});
-
-// strip comments
-appJson = appJson.replace(/\/\*[\s\S]*?\*\//g, '');
-
-// correct escaping ("\."" -> "\\."")
-appJson = appJson.replace(/([^\\])\\\./g, '$1\\\\.');
-
-// parse JSON
-appJson = JSON.parse(appJson);
-
-// detect packages directory relative to app.json
-packagesPath = path.join(appDir, 'packages');
-if (!fs.existsSync(packagesPath)) {
-	// try going up one directory to workspace
-	packagesPath = path.join(appDir, '..', 'packages');
-}
-
-if (!fs.existsSync(packagesPath)) {
-	throw 'Could not find packages directory';
-}
-
-
-
-// process command
 if (chakiCommand == 'install') {
+	_executeInstall();
+} else if (chakiCommand == 'update') {
+	_executeUpdate();
+} else if (chakiCommand == 'dump-app-props') {
+	_executeDumpAppProps();
+} else if (chakiCommand == 'dump-cmd-props') {
+	_executeDumpCmdProps();
+} else {
+	console.error('Usage: chaki install');
+}
+
+
+
+
+
+
+
+
+
+
+
+// LIBRARY (TODO: move to external file)
+function _loadAppProperties() {
+	console.error('Loading app configuration from ' + appJsonPath + '...');
+
+	if (!fs.existsSync(appJsonPath)) {
+		console.error('Unable to find app.json at ' + appJsonPath);
+		shell.exit(1);
+	}
+
+	var jsonString = fs.readFileSync(appJsonPath, {encoding: 'utf8'});
+
+	// strip comments
+	jsonString = jsonString.replace(/\/\*[\s\S]*?\*\//g, '');
+
+	// correct escaping ("\."" -> "\\."")
+	jsonString = jsonString.replace(/([^\\])\\\./g, '$1\\\\.');
+
+	var jsonObject = JSON.parse(jsonString);
+
+	console.error('Loaded ' + Object.keys(jsonObject).length + ' properties.');
+
+	return jsonObject;
+}
+
+
+function _loadCmdProperties() {
+	console.error('Loading Sencha CMD configuration...');
+
+	if (!shell.which('sencha')) {
+		console.error('Unable to find sencha command in path');
+		shell.exit(1);
+	}
+
+	var properties = {},
+		cmdOutput = shell.exec('sencha ant .props', {silent:true}).output,
+		propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
+		propertyMatch;
+
+	while ((propertyMatch = propertyRe.exec(cmdOutput)) !== null) {
+		properties[propertyMatch[1]] = propertyMatch[2];
+	}
+
+	console.error('Loaded ' + Object.keys(properties).length + ' properties.');
+
+	return properties;
+}
+
+
+function _getWorkspacePackagesPath(cmdProperties) {
+	var path = cmdProperties['workspace.packages.dir'];
+
+	if (!path) {
+		console.error('Sencha CMD workspace does not define workspace.packages.dir');
+		shell.exit(1);
+	}
+
+	if (!fs.existsSync(path)) {
+		shell.mkdir('-p', path);
+	}
+
+	return path;
+}
+
+
+function _executeInstall() {
+	var appConfig = _loadAppProperties(),
+		cmdProperties = _loadCmdProperties(),
+		workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+
 	// TODO: crawl package sub-dependencies
 	// TODO: deal with framework/version branches
 
 	// install packages
-	appJson.requires.forEach(function(packageName) {
-		var packagePath = path.join(packagesPath, packageName);
+	appConfig.requires.forEach(function(packageName) {
+		var packagePath = path.join(workspacePackagesPath, packageName);
 
 		if (fs.existsSync(packagePath)) {
 			console.log('Package already installed: ' + packageName);
@@ -71,8 +132,19 @@ if (chakiCommand == 'install') {
 			}
 		});
 	});
-} else if (chakiCommand == 'update') {
+}
+
+
+function _executeUpdate() {
 	console.log('TODO: update packages');
-} else {
-	console.error('Usage: chaki install');
+}
+
+
+function _executeDumpAppProps() {
+	console.log(JSON.stringify(_loadAppProperties(), null, 4));
+}
+
+
+function _executeDumpCmdProps() {
+	console.log(JSON.stringify(_loadCmdProperties(), null, 4));
 }
