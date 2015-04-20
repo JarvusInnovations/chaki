@@ -9,5 +9,6 @@
         "restler": "*",
         "minimist": "*",
         "shelljs": "*"
-    }
+    },
+    "bin": "./chaki.js"
 }
