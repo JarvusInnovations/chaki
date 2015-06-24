@@ -19,7 +19,7 @@ if (chakiCommand == 'install') {
 } else if (chakiCommand == 'dump-cmd-props') {
     _executeDumpCmdProps();
 } else {
-    console.error('Usage: chaki install');
+    console.error('Usage: chaki install [package]');
 }
 
 
@@ -99,13 +99,15 @@ function _getWorkspacePackagesPath(cmdProperties) {
 function _executeInstall() {
     var appConfig = _loadAppProperties(),
         cmdProperties = _loadCmdProperties(),
-        workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+        workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties),
+        requestedPackage = argv._[1],
+        packages = requestedPackage ? [requestedPackage] : appConfig.requires;
 
     // TODO: crawl package sub-dependencies
     // TODO: deal with framework/version branches
 
     // install packages
-    appConfig.requires.forEach(function(packageName) {
+    packages.forEach(function(packageName) {
         var packagePath = path.join(workspacePackagesPath, packageName);
 
         if (fs.existsSync(packagePath)) {
