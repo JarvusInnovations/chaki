@@ -6,7 +6,7 @@ var fs = require('fs'),
     shell = require('shelljs'),
     argv = require('minimist')(process.argv.slice(2)),
     chakiCommand = argv._[0],
-    appJsonPath = path.resolve(argv._[1] || './app.json'),
+    appJsonPath = path.resolve(argv.app ? (argv.app + '/app.json') : './app.json'),
     appDir = path.dirname(appJsonPath);
 
 
