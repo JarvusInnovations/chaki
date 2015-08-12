@@ -7,6 +7,7 @@ var fs = require('fs'),
     argv = require('minimist')(process.argv.slice(2)),
     chakiCommand = argv._[0],
     appJsonPath = path.resolve(argv.app ? (argv.app + '/app.json') : './app.json'),
+    buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml'),
     appDir = path.dirname(appJsonPath);
 
 
@@ -52,13 +53,18 @@ function _loadAppProperties() {
     var jsonObject = JSON.parse(jsonString);
 
     console.error('Loaded ' + Object.keys(jsonObject).length + ' properties.');
-
+    console.log(jsonObject);
     return jsonObject;
 }
 
 
 function _loadCmdProperties() {
     console.error('Loading Sencha CMD configuration...');
+
+    if (!fs.existsSync(buildXMLPath)) {
+        console.error('Unable to find build.xml at ' + buildXMLPath);
+        shell.exit(1);
+    }
 
     if (!shell.which('sencha')) {
         console.error('Unable to find sencha command in path');
@@ -70,12 +76,13 @@ function _loadCmdProperties() {
         propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
         propertyMatch;
 
+    console.log(cmdOutput);
     while ((propertyMatch = propertyRe.exec(cmdOutput)) !== null) {
         properties[propertyMatch[1]] = propertyMatch[2];
     }
 
     console.error('Loaded ' + Object.keys(properties).length + ' properties.');
-
+    console.log(properties);
     return properties;
 }
 
