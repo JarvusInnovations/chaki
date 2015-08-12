@@ -114,8 +114,13 @@ function _executeInstall() {
     // TODO: deal with framework/version branches
 
     // install packages
-    packages.forEach(function(packageName) {
-        var packagePath = path.join(workspacePackagesPath, packageName);
+    packages.forEach(function (packageName) {
+        _installPackage(packageName, workspacePackagesPath);
+    });
+}
+
+function _installPackage(packageName, workspacePackagesPath) {
+     var packagePath = path.join(workspacePackagesPath, packageName);
 
         if (fs.existsSync(packagePath)) {
             console.log('Package already installed: ' + packageName);
@@ -136,13 +141,14 @@ function _executeInstall() {
                 return;
             }
 
+            console.log("[chaki] ", packageName);
+            console.log("[chaki] ", responseData.data);
+
             if (shell.exec('git clone https://github.com/'+responseData.data.GitHubPath+'.git ' + packagePath).code !== 0) {
                 console.error('Error: failed to clone from GitHub');
             }
         });
-    });
 }
-
 
 function _executeUpdate() {
     console.log('TODO: update packages');
