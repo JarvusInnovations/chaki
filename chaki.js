@@ -103,6 +103,7 @@ function _getWorkspacePackagesPath(cmdProperties) {
 }
 
 
+// init
 function _executeInstall() {
     var appConfig = _loadAppProperties(),
         cmdProperties = _loadCmdProperties(),
@@ -114,41 +115,58 @@ function _executeInstall() {
     // TODO: deal with framework/version branches
 
     // install packages
+    _installPackages(packages, workspacePackagesPath);
+
+}
+
+// Loop through list of configured dependencies
+function _installPackages(packages, workspacePackagesPath) {
     packages.forEach(function (packageName) {
-        _installPackage(packageName, workspacePackagesPath);
+        _installPackage(packageName, workspacePackagesPath, function (err) {
+            if (!err) {
+             //   _tracePackageDependencies(packageName, workspacePackagesPath);
+            }
+        });
     });
 }
 
+// Install single package and its dependencies
 function _installPackage(packageName, workspacePackagesPath) {
-     var packagePath = path.join(workspacePackagesPath, packageName);
+    var packagePath = path.join(workspacePackagesPath, packageName);
 
-        if (fs.existsSync(packagePath)) {
-            console.log('Package already installed: ' + packageName);
-            return;
+    if (fs.existsSync(packagePath)) {
+        console.log('Package already installed: ' + packageName);
+        return;
+    }
+
+    console.log('Fetching package: ' + packageName);
+    restler.get('http://chaki.io/packages/' + packageName, {
+        headers: {
+            Accept: 'application/json'
+        }
+    }).on('complete', function(responseData, response) {
+        if (response.statusCode == 404) {
+            console.error('Error: Package "'+packageName+'" was not found on chaki.io');
+            return {error : true};
+        } else if (response.statusCode != 200 || !responseData.success) {
+            console.error('Error: Failed to load package data from chaki.io, unknown problem (HTTP status '+response.statusCode+')');
+            return {error : true};
         }
 
-        console.log('Fetching package: ' + packageName);
-        restler.get('http://chaki.io/packages/' + packageName, {
-            headers: {
-                Accept: 'application/json'
-            }
-        }).on('complete', function(responseData, response) {
-            if (response.statusCode == 404) {
-                console.error('Error: Package "'+packageName+'" was not found on chaki.io');
-                return;
-            } else if (response.statusCode != 200 || !responseData.success) {
-                console.error('Error: Failed to load package data from chaki.io, unknown problem (HTTP status '+response.statusCode+')');
-                return;
-            }
+        console.log("[chaki] ", packageName);
+        console.log("[chaki] ", responseData.data);
 
-            console.log("[chaki] ", packageName);
-            console.log("[chaki] ", responseData.data);
-
-            if (shell.exec('git clone https://github.com/'+responseData.data.GitHubPath+'.git ' + packagePath).code !== 0) {
-                console.error('Error: failed to clone from GitHub');
-            }
-        });
+        if (shell.exec('git clone https://github.com/'+responseData.data.GitHubPath+'.git ' + packagePath).code !== 0) {
+            console.error('Error: failed to clone from GitHub');
+            return {error : true};
+        }
+    });
 }
+
+// function _tracePackageDependencies(packageName, workspacePackagesPath) {
+//     var deps = _loadAppProperties().requires,
+
+// }
 
 function _executeUpdate() {
     console.log('TODO: update packages');
