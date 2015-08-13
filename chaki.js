@@ -5,11 +5,10 @@ var fs = require('fs'),
     shell = require('shelljs'),
     argv = require('minimist')(process.argv.slice(2)),
     chakiCommand = argv._[0],
+    that,
     appJsonPath = path.resolve(argv.app ? (argv.app + '/app.json') : './app.json'),
     buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml'),
-    appDir = path.dirname(appJsonPath),
-    chakiDir = '/var/dev/chaki/', // @@TODO - this should be sorted out via NPM
-    that;
+    appDir = path.dirname(appJsonPath);
 
 var chakiApp = chakiApp || {
 
@@ -17,7 +16,7 @@ var chakiApp = chakiApp || {
         that = this;
         var command = argv._[0];
         this.args = argv;
-        console.log("[chaki] init - ", appDir);
+        console.log("[chaki] init - ", argv);
         if (this.commands[command]) {
             this.commands[command]();
         } else {
@@ -26,10 +25,27 @@ var chakiApp = chakiApp || {
         }
     },
 
+    _getAppJsonPath : function (packagePath) {
+        // if nothing is passed, use working directory
+        if (!packagePath) {
+            return path.resolve(argv.app ? (argv.app + '/app.json') : './app.json');
+        }
+        // otherwise, we're in a package directory looking for dependencies
+
+    },
+
+    _getBuildXMLPath : function (package) {
+
+    },
+
+    _getAppDir : function () {
+
+    },
+
     commands : {
         install : function () {
             console.log("[chaki] Do install");
-            var Install = require(chakiDir + '/lib/install');
+            var Install = require(__dirname + '/lib/install');
             Install.init(that);
         },
 
