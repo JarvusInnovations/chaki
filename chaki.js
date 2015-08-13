@@ -9,7 +9,7 @@ var fs = require('fs'),
     buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml');
 
 var chakiApp = chakiApp || {
-
+    registryUrl : "http://chaki.io/packages/", // API providing package registry information
     init : function (opts) {
         that = this;
         var command = opts.command || this._camelCased(argv._[0]);
@@ -46,7 +46,7 @@ var chakiApp = chakiApp || {
         install : function () {
             console.log("[chaki] Do install");
             var Install = require(__dirname + '/lib/install');
-            Install.init(that);
+            Install.init({app: that});
         },
 
         update : function () {

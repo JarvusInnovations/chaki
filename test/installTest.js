@@ -1,13 +1,13 @@
 var chaki = require('../chaki'),
     path = require('path'),
     shell = require('shelljs'),
-    testGitRepo : "starsinmypockets";
+    testGitRepo = "starsinmypockets";
 
 // quick mock of API
 // module A depends on module B
 //   not listed
-var mockApi : {
-    moduleA : {
+var mockApi = {
+    moduleA : 
         { ID: 20,
           Class: 'Chaki\\Package',
           Created: 1433185986,
@@ -16,9 +16,8 @@ var mockApi : {
           GitHubPath: testGitRepo + '/chaki-test-module-A',
           Description: null,
           README: null 
-        }
-    },
-    moduleB : {
+        },
+    moduleB : 
     { ID: 20,
       Class: 'Chaki\\Package',
       Created: 1433185986,
@@ -28,7 +27,7 @@ var mockApi : {
       Description: null,
       README: null 
     }
-}
+};
 
 var testChakiRuns = function (test) {
     chaki.init({command : 'test'});
@@ -43,7 +42,11 @@ var testGetAppJsonPath = function (test) {
     test.done();
 };
 
+var testInstall = function (test) {
+    test.done();
+};
 
 
 module.exports.testChakiRuns = testChakiRuns;
 module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testInstall = testInstall;
