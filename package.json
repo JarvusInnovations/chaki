@@ -1,15 +1,15 @@
 {
-    "name": "chaki",
-    "version": "0.0.1",
-    "description": "A community package manager for Sencha frameworks",
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/JarvusInnovations/chaki"
-    },
-    "dependencies": {
-        "restler": "*",
-        "minimist": "*",
-        "shelljs": "*"
-    },
-    "bin": "./chaki.js"
+  "name": "chaki",
+  "version": "0.0.1",
+  "description": "A community package manager for Sencha frameworks",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JarvusInnovations/chaki"
+  },
+  "dependencies": {
+    "restler": "*",
+    "minimist": "*",
+    "shelljs": "*"
+  },
+  "bin": "./chaki.js"
 }

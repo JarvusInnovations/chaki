@@ -12,7 +12,7 @@ var chakiApp = chakiApp || {
 
     init : function (opts) {
         that = this;
-        var command = this._camelCased(argv._[0]);
+        var command = opts.command || this._camelCased(argv._[0]);
         this.args = argv;
         console.log("[chaki] init - ", argv);
         if (this.commands[command]) {
@@ -65,7 +65,7 @@ var chakiApp = chakiApp || {
         },
 
         test : function () {
-            console.log("[chaki] TEST");
+            console.log("[chaki] Hello World");
         }
     },
 
@@ -119,7 +119,6 @@ var chakiApp = chakiApp || {
         }
 
         console.error('Loaded ' + Object.keys(properties).length + ' properties.');
-        console.log(properties);
         return properties;
     },
 
@@ -139,10 +138,13 @@ var chakiApp = chakiApp || {
     },
 
     _camelCased : function (str) {
-        return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        if (str) {
+            return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
+        }
     }
 
 };
 
 
 chakiApp.init(argv);
+module.exports = chakiApp;
