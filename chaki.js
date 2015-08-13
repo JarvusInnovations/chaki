@@ -5,18 +5,19 @@ var fs = require('fs'),
     shell = require('shelljs'),
     argv = require('minimist')(process.argv.slice(2)),
     chakiCommand = argv._[0],
-    that,
-    buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml');
+    _ = require('underscore'),
+    that;
 
 var chakiApp = chakiApp || {
     registryUrl : "http://chaki.io/packages/", // API providing package registry information
     init : function (opts) {
         that = this;
         var command = opts.command || this._camelCased(argv._[0]);
-        this.args = argv;
-        console.log("[chaki] init - ", argv);
+        this.args = opts.args || argv;
+        _.extend(this, opts);
+        console.error("[chaki] init - ", argv);
         if (this.commands[command]) {
-            this.commands[command]();
+            this.commands[command](opts);
         } else {
             console.error("Invalid command " + command);
             console.error('Usage: chaki command [package]');
@@ -24,18 +25,28 @@ var chakiApp = chakiApp || {
     },
 
     _getAppJsonPath : function (packagePath) {
+        var outPath;
         // if nothing is passed, use working directory
         if (!packagePath) {
-            return path.resolve(argv.app ? (argv.app + '/app.json') : './app.json');
+            outPath = path.resolve(this.args.app ? (this.args.app + '/app.json') : './app.json');
+        } else {  // otherwise, we're in a package directory looking for dependencies
+            outPath = path.resolve(packagePath);
         }
 
-        return path.resolve(packagePath);
-        // otherwise, we're in a package directory looking for dependencies
-
+        console.error("_getAppJsonPath", outPath);
+        return outPath;
     },
 
-    _getBuildXMLPath : function (package) {
-
+    _getBuildXMLPath : function (packagePath) {
+        var outPath;
+        // if nothing is passed, use working directory
+        if (!packagePath) {
+            outPath = path.resolve(this.args.app ? (this.args.app + '/build.xml') : './build.xml');
+        } else { // otherwise, we're in a package directory looking for dependencies
+            outPath = path.resolve(packagePath);
+        }
+        console.error("_getBuildXMLPath", outPath);
+        return outPath;
     },
 
     _getAppDir : function () {
@@ -43,29 +54,29 @@ var chakiApp = chakiApp || {
     },
 
     commands : {
-        install : function () {
-            console.log("[chaki] Do install");
+        install : function (opts) {
+            console.error("[chaki] Do install");
             var Install = require(__dirname + '/lib/install');
-            Install.init({app: that});
+            Install.installPackages({app: that, method : opts.method});
         },
 
         update : function () {
-            console.log("[chaki] @@TODO: Do update");
+            console.error("[chaki] @@TODO: Do update");
         },
 
         dumpAppProps : function () {
-            console.log("[chaki] Do dump app props");
+            console.error("[chaki] Do dump app props");
             var path = that._getAppJsonPath();
             console.error(JSON.stringify(that._loadAppProperties(path), null, 4));
         },
 
         dumpCmdProps : function () {
-            console.log("[chaki] Do dump cmd props");
-            console.log(JSON.stringify(that._loadCmdProperties(), null, 4));
+            console.error("[chaki] Do dump cmd props");
+            console.error(JSON.stringify(that._loadCmdProperties(), null, 4));
         },
 
         test : function () {
-            console.log("[chaki] Hello World");
+            console.error("[chaki] Hello World");
         }
     },
 
@@ -90,13 +101,14 @@ var chakiApp = chakiApp || {
         var jsonObject = JSON.parse(jsonString);
 
         console.error('Loaded ' + Object.keys(jsonObject).length + ' properties.');
-        console.log(jsonObject);
+        console.error(jsonObject);
         return jsonObject;
     },
 
     // @@TODO same as appPath above
-    _loadCmdProperties : function () {
+    _loadCmdProperties : function (buildXMLPath) {
         console.error('Loading Sencha CMD configuration...');
+        var buildXMLPath = this._getBuildXMLPath(buildXMLPath);
 
         if (!fs.existsSync(buildXMLPath)) {
             console.error('Unable to find build.xml at ' + buildXMLPath);
@@ -107,13 +119,12 @@ var chakiApp = chakiApp || {
             console.error('Unable to find sencha command in path');
             shell.exit(1);
         }
-
+        shell.cd(this.args.app);
         var properties = {},
             cmdOutput = shell.exec('sencha ant .props', {silent:true}).output,
             propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
             propertyMatch;
 
-        console.log(cmdOutput);
         while ((propertyMatch = propertyRe.exec(cmdOutput)) !== null) {
             properties[propertyMatch[1]] = propertyMatch[2];
         }
