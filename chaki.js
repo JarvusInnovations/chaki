@@ -6,15 +6,13 @@ var fs = require('fs'),
     argv = require('minimist')(process.argv.slice(2)),
     chakiCommand = argv._[0],
     that,
-    appJsonPath = path.resolve(argv.app ? (argv.app + '/app.json') : './app.json'),
-    buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml'),
-    appDir = path.dirname(appJsonPath);
+    buildXMLPath = path.resolve(argv.app ? (argv.app + '/build.xml') : './build.xml');
 
 var chakiApp = chakiApp || {
 
     init : function (opts) {
         that = this;
-        var command = argv._[0];
+        var command = this._camelCased(argv._[0]);
         this.args = argv;
         console.log("[chaki] init - ", argv);
         if (this.commands[command]) {
@@ -30,6 +28,8 @@ var chakiApp = chakiApp || {
         if (!packagePath) {
             return path.resolve(argv.app ? (argv.app + '/app.json') : './app.json');
         }
+
+        return path.resolve(packagePath);
         // otherwise, we're in a package directory looking for dependencies
 
     },
@@ -55,7 +55,8 @@ var chakiApp = chakiApp || {
 
         dumpAppProps : function () {
             console.log("[chaki] Do dump app props");
-            console.log(JSON.stringify(that._loadAppProperties(), null, 4));
+            var path = that._getAppJsonPath();
+            console.error(JSON.stringify(that._loadAppProperties(path), null, 4));
         },
 
         dumpCmdProps : function () {
@@ -68,7 +69,9 @@ var chakiApp = chakiApp || {
         }
     },
 
-    _loadAppProperties : function () {
+    // @@TODO separate the appPathJson out of the logic here
+    // @@TODO it should just get a path, and then return an object 
+    _loadAppProperties : function (appJsonPath) {
         console.error('Loading app configuration from ' + appJsonPath + '...');
 
         if (!fs.existsSync(appJsonPath)) {
@@ -91,6 +94,7 @@ var chakiApp = chakiApp || {
         return jsonObject;
     },
 
+    // @@TODO same as appPath above
     _loadCmdProperties : function () {
         console.error('Loading Sencha CMD configuration...');
 
@@ -132,7 +136,12 @@ var chakiApp = chakiApp || {
         }
 
         return path;
+    },
+
+    _camelCased : function (str) {
+        return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
     }
+
 };
 
 
