@@ -101,7 +101,6 @@ var chakiApp = chakiApp || {
         var jsonObject = JSON.parse(jsonString);
 
         console.error('Loaded ' + Object.keys(jsonObject).length + ' properties.');
-        console.error(jsonObject);
         return jsonObject;
     },
 
@@ -119,7 +118,10 @@ var chakiApp = chakiApp || {
             console.error('Unable to find sencha command in path');
             shell.exit(1);
         }
-        shell.cd(this.args.app);
+        if (this.args.app) {
+            shell.cd(this.args.app);
+        }
+        
         var properties = {},
             cmdOutput = shell.exec('sencha ant .props', {silent:true}).output,
             propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
