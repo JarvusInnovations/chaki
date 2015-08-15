@@ -10,12 +10,16 @@ var fs = require('fs'),
 
 var chakiApp = chakiApp || {
     registryUrl : "http://chaki.io/packages/", // API providing package registry information
+    tree : {}, // store dependency tree here
     init : function (opts) {
         that = this;
-        var command = opts.command || this._camelCased(argv._[0]);
         this.args = opts.args || argv;
+
+        var command = opts.command || this._camelCased(argv._[0]);
+
         _.extend(this, opts);
         console.error("[chaki] init - ", argv);
+        console.error("[chaki] init - 1", this.workspacePackagesPath);
         if (this.commands[command]) {
             this.commands[command](opts);
         } else {
@@ -26,9 +30,10 @@ var chakiApp = chakiApp || {
 
     _getAppJsonPath : function (packagePath) {
         var outPath;
+        console.log("[app] _getAppJsonPath", packagePath, this.args.app);
         // if nothing is passed, use working directory
         if (!packagePath) {
-            outPath = path.resolve(this.args.app ? (this.args.app + '/app.json') : './app.json');
+            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, 'app.json') : path.resolve(__dirname, './app.json');
         } else {  // otherwise, we're in a package directory looking for dependencies
             outPath = path.resolve(packagePath);
         }
@@ -37,13 +42,14 @@ var chakiApp = chakiApp || {
         return outPath;
     },
 
-    _getBuildXMLPath : function (packagePath) {
+    _getBuildXMLPath : function (componentPath) {
+        console.error("AR", this.args);
         var outPath;
         // if nothing is passed, use working directory
-        if (!packagePath) {
+        if (!componentPath) {
             outPath = path.resolve(this.args.app ? (this.args.app + '/build.xml') : './build.xml');
         } else { // otherwise, we're in a package directory looking for dependencies
-            outPath = path.resolve(packagePath);
+            outPath = path.resolve(componentPath);
         }
         console.error("_getBuildXMLPath", outPath);
         return outPath;
@@ -56,7 +62,10 @@ var chakiApp = chakiApp || {
     commands : {
         install : function (opts) {
             console.error("[chaki] Do install");
+            var cmdProperties = that._loadCmdProperties();
             var Install = require(__dirname + '/lib/install');
+            that.workspacePackagesPath = that._getWorkspacePackagesPath(cmdProperties);
+            console.error("A-in-1", that.workspacePackagesPath);
             Install.installPackages({app: that, method : opts.method});
         },
 
@@ -80,8 +89,6 @@ var chakiApp = chakiApp || {
         }
     },
 
-    // @@TODO separate the appPathJson out of the logic here
-    // @@TODO it should just get a path, and then return an object 
     _loadAppProperties : function (appJsonPath) {
         console.error('Loading app configuration from ' + appJsonPath + '...');
 
@@ -104,10 +111,9 @@ var chakiApp = chakiApp || {
         return jsonObject;
     },
 
-    // @@TODO same as appPath above
-    _loadCmdProperties : function (buildXMLPath) {
+    _loadCmdProperties : function (componentPath) {
         console.error('Loading Sencha CMD configuration...');
-        var buildXMLPath = this._getBuildXMLPath(buildXMLPath);
+        var  buildXMLPath = this._getBuildXMLPath(componentPath);
 
         if (!fs.existsSync(buildXMLPath)) {
             console.error('Unable to find build.xml at ' + buildXMLPath);
@@ -118,26 +124,50 @@ var chakiApp = chakiApp || {
             console.error('Unable to find sencha command in path');
             shell.exit(1);
         }
+
         if (this.args.app) {
             shell.cd(this.args.app);
         }
-        
-        var properties = {},
-            cmdOutput = shell.exec('sencha ant .props', {silent:true}).output,
-            propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
-            propertyMatch;
 
-        while ((propertyMatch = propertyRe.exec(cmdOutput)) !== null) {
-            properties[propertyMatch[1]] = propertyMatch[2];
+        // try to recover gracefully if there's an issue with sencha cmd
+        try {
+            var properties = {},
+                cmdOutput = shell.exec('sencha ant .props', {silent:true}).output,
+                propertyRe = /\[echoproperties\]\s*([a-zA-Z0-9.\-]+)\s*=\s*([^\n]+)/g, // 
+                propertyMatch;
+
+            while ((propertyMatch = propertyRe.exec(cmdOutput)) !== null) {
+                properties[propertyMatch[1]] = propertyMatch[2];
+            }
+
+            console.error('Loaded ' + Object.keys(properties).length + ' properties.');
+            return properties;
+        } catch (e) {
+            console.error("Error loading Sencha Cmd", e);
+            return {};
         }
-
-        console.error('Loaded ' + Object.keys(properties).length + ' properties.');
-        return properties;
     },
 
+    getWorkspacePackagesPath : function (opts) {
+        console.error('[App] gwspp 1', opts);
+        var workspacePath = __dirname + '';
+        if (opts.parents) {
+            _.each(opts.parents, function (parent) {
+                path = path.concat(parent + '/packages/');
+            });
+        }
+
+        console.error('[App] gwspp 1', path.resolve(workspacePath));
+
+        return path.resolve(workspacePath);
+        // get dependencies base directory
+        // for each 
+    },
+
+    //
     _getWorkspacePackagesPath : function (cmdProperties) {
         var path = cmdProperties['workspace.packages.dir'];
-
+        console.error("_workspacePath", path);
         if (!path) {
             console.error('Sencha CMD workspace does not define workspace.packages.dir');
             shell.exit(1);
