@@ -37,7 +37,11 @@ var mockApi = {
 };
 
 var testChakiRuns = function (test) {
-    chaki.init({command : 'test'});
+    console.error("TEST 1");
+    chaki.init({
+        command : 'test',
+        args : {}
+    });
     test.ok(1 === 1);
     test.done();
 };
