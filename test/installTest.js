@@ -3,6 +3,7 @@ var chaki = require('../chaki'),
     shell = require('shelljs'),
     rmdir = require('rimraf'),
     fs = require('fs'),
+    testModulePath = 'test/testApp/sencha-workspace/SlateAdmin/',
     testGitRepo = "starsinmypockets";
 
 // quick mock of API
@@ -47,15 +48,35 @@ var testChakiRuns = function (test) {
 };
 
 var testGetAppJsonPath = function (test) {
+    console.error("TEST 2");
     var jsonPath = chaki._getAppJsonPath();
     test.ok(jsonPath === path.resolve(__dirname, '..', 'app.json'), "_getAppJsonPath should be the same as the chaki path");
     test.ok(chaki._getAppJsonPath('ext/123') === path.resolve(__dirname, '..', 'ext', '123'));
     test.done();
 };
 
+// givn path to a bujild.xml, this should kick out properties from sencha
+var testGetBuildXML = function (test) {
+    console.error("TEST 5");
+    test.expect(3);
+    chaki.args.app = testModulePath;
+    var cmds = chaki._loadCmdProperties();
+    var workspaceDir = cmds['workspace.packages.dir'];
+    test.ok(typeof cmds === 'object');
+    test.ok(typeof workspaceDir === "string");
+    test.ok(workspaceDir.split('/').length > 0);
+    test.done();
+};
+
+var testGetWorkspacePackagePath = function (test) {
+    console.error("TEST 3", __dirname);
+    chaki._getWorkspacePackagesPath();
+    test.done();
+};
+
 var testInstall = function (test) {
         var pkgDir = 'testApp/sencha-workspace/packages/';
-        var pkgPath = path.resolve(__dirname, pkgDir)
+        var pkgPath = path.resolve(__dirname, pkgDir);
         test.expect(1);
         // remove old packages from test app packageDir
         rmdir(pkgPath, function () {
@@ -74,6 +95,8 @@ var testInstall = function (test) {
 };
 
 
-module.exports.testChakiRuns = testChakiRuns;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testInstall = testInstall;
+// module.exports.testChakiRuns = testChakiRuns;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testGetWorkspacePackagePath = testGetWorkspacePackagePath;
+module.exports.testGetBuildXML = testGetBuildXML;
+//module.exports.testInstall = testInstall;
