@@ -127,4 +127,4 @@ var testInstall = function (test) {
 module.exports.testGetAppJsonPath = testGetAppJsonPath;
 module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 module.exports.testGetBuildXML = testGetBuildXML;
-// module.exports.testInstall = testInstall;
+module.exports.testInstall = testInstall;

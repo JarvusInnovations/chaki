@@ -64,7 +64,7 @@ var chakiApp = chakiApp || {
         install : function (opts) {
             console.error("[chaki] Do install");
             var cmdProperties = that._loadCmdProperties();
-            var Install = require(__diname + '/lib/install');
+            var Install = require(__dirname + '/lib/install');
             that.workspacePackagesPath = that._getWorkspacePackagesPath(cmdProperties);
             console.error("A-in-1", that.workspacePackagesPath);
             Install.installPackages({app: that, method : opts.method});
