@@ -18,7 +18,7 @@ var chakiApp = chakiApp || {
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
-        console.error("[chaki] init - ", argv);
+        console.error("[chaki] init - ", this.args);
         console.error("[chaki] init - 1", this.workspacePackagesPath);
         if (this.commands[command]) {
             this.commands[command](opts);
@@ -43,13 +43,14 @@ var chakiApp = chakiApp || {
     },
 
     _getBuildXMLPath : function (componentPath) {
-        console.error("AR", this.args);
+        console.error("AR", componentPath, this.args.app);
         var outPath;
         // if nothing is passed, use working directory
         if (!componentPath) {
-            outPath = path.resolve(this.args.app ? (this.args.app + '/build.xml') : './build.xml');
+            console.log('>>', this.args.app);
+            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(__dirname, './build.xml');
         } else { // otherwise, we're in a package directory looking for dependencies
-            outPath = path.resolve(componentPath);
+            outPath = path.resolve(componentPath) + '/build.xml';
         }
         console.error("_getBuildXMLPath", outPath);
         return outPath;
@@ -63,7 +64,7 @@ var chakiApp = chakiApp || {
         install : function (opts) {
             console.error("[chaki] Do install");
             var cmdProperties = that._loadCmdProperties();
-            var Install = require(__dirname + '/lib/install');
+            var Install = require(__diname + '/lib/install');
             that.workspacePackagesPath = that._getWorkspacePackagesPath(cmdProperties);
             console.error("A-in-1", that.workspacePackagesPath);
             Install.installPackages({app: that, method : opts.method});

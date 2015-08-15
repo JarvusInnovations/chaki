@@ -6,9 +6,21 @@ var chaki = require('../chaki'),
     testModulePath = 'test/testApp/sencha-workspace/SlateAdmin/',
     testGitRepo = "starsinmypockets";
 
-// quick mock of API
-// module A depends on module B
-//   not listed
+
+/**
+ * Mock up API returns
+ *
+ * Project structure is as follows:
+ *
+ * APP
+ * ├─┬ moduleA
+ * │ ├── moduleA-1
+ * │ └── moduleA-2
+ * └─┬ moduleB
+ *   └──┬ moduleB-1
+ *      ├── moduleB-1-a
+ *      └── moduleB-1-b   
+ */
 var mockApi = {
     moduleA :  {
         data : 
@@ -55,48 +67,64 @@ var testGetAppJsonPath = function (test) {
     test.done();
 };
 
+var testGetBuildXMLPath = function (test) {
+  var appPath = path.resolve(__dirname, '..');
+  var p1 = chaki._getBuildXMLPath();
+  var p2 = chaki._getBuildXMLPath("packageName");
+
+  // check from specified app dir
+  chaki.args.app = "path/to/app";
+
+  var p3 = chaki._getBuildXMLPath();
+  var p4  = chaki._getBuildXMLPath("packageName");
+
+  test.ok(p1 === appPath + '/build.xml');
+  test.ok(p2 === appPath + '/packageName/build.xml');
+  test.ok(p3 === appPath + '/path/to/app/build.xml');
+  test.ok(p4 === appPath + '/packageName/build.xml');
+
+  console.log('TEST 3', path.resolve(__dirname, '..'), '1', p1, '2', p2, '3', p3, '4', p4);
+  test.done();
+};
+
 // givn path to a bujild.xml, this should kick out properties from sencha
 var testGetBuildXML = function (test) {
-    console.error("TEST 5");
-    test.expect(3);
+    console.error("TEST 4");
     chaki.args.app = testModulePath;
     var cmds = chaki._loadCmdProperties();
     var workspaceDir = cmds['workspace.packages.dir'];
+    var path = chaki._getWorkspacePackagesPath(cmds);
+    test.ok(fs.existsSync(path), "Path from _getWorkspacePackagesPath should exist");
     test.ok(typeof cmds === 'object');
     test.ok(typeof workspaceDir === "string");
     test.ok(workspaceDir.split('/').length > 0);
     test.done();
 };
 
-var testGetWorkspacePackagePath = function (test) {
-    console.error("TEST 3", __dirname);
-    chaki._getWorkspacePackagesPath();
-    test.done();
-};
 
 var testInstall = function (test) {
-        var pkgDir = 'testApp/sencha-workspace/packages/';
-        var pkgPath = path.resolve(__dirname, pkgDir);
-        test.expect(1);
-        // remove old packages from test app packageDir
-        rmdir(pkgPath, function () {
-            // put it back
-            fs.mkdirSync(pkgPath);
-            console.log("111");
-            chaki.init({
-                command : "install",
-                method : "test",
-                mockApi : mockApi,
-                args : {
-                    app : 'test/testApp/sencha-workspace/SlateAdmin/'
-                }
-            });
-        });
+  var pkgDir = 'testApp/sencha-workspace/packages/';
+  var pkgPath = path.resolve(__dirname, pkgDir);
+  test.expect(1);
+  // remove old packages from test app packageDir
+  rmdir(pkgPath, function () {
+      // put it back
+      fs.mkdirSync(pkgPath);
+      console.log("111");
+      chaki.init({
+          command : "install",
+          method : "test",
+          mockApi : mockApi,
+          args : {
+              app : 'test/testApp/sencha-workspace/SlateAdmin/'
+          }
+      });
+  });
 };
 
 
 // module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
-// module.exports.testGetWorkspacePackagePath = testGetWorkspacePackagePath;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 module.exports.testGetBuildXML = testGetBuildXML;
-//module.exports.testInstall = testInstall;
+// module.exports.testInstall = testInstall;
