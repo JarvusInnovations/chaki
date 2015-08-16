@@ -10,7 +10,7 @@ var fs = require('fs'),
 
 var chakiApp = chakiApp || {
     registryUrl : "http://chaki.io/packages/", // API providing package registry information
-    tree : {}, // store dependency tree here
+    depDirMode : 0755, // @@TODO what file mode we want here?
     init : function (opts) {
         that = this;
         this.args = opts.args || argv;
@@ -43,7 +43,7 @@ var chakiApp = chakiApp || {
     },
 
     _getBuildXMLPath : function (componentPath) {
-        console.error("AR", componentPath, this.args.app);
+        console.error("[chaki] _getBuildXMLPath", componentPath, this.args.app);
         var outPath;
         // if nothing is passed, use working directory
         if (!componentPath) {
