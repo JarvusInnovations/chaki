@@ -6,23 +6,27 @@ var chaki = require('../chaki'),
     testModulePath = 'test/testApp/sencha-workspace/SlateAdmin/',
     testGitRepo = "starsinmypockets";
 
+// snitch on uncaught exceptions please
+process.on('uncaughtException', function(err) {
+  console.error(err.stack);
+});
 
 /**
  * Mock up API returns
  *
- * Project structure is as follows:
+ * @@TODO Project structure is as follows:
  *
  * APP
- * ├─┬ moduleA
- * │ ├── moduleA-1
- * │ └── moduleA-2
- * └─┬ moduleB
- *   └──┬ moduleB-1
- *      ├── moduleB-1-a
- *      └── moduleB-1-b   
+ * ├─┬ chaki-test-module-A
+ * │ ├── chaki-test-module-A-1
+ * │ └── chaki-test-module-A-2
+ * └─┬ chaki-test-module-B
+ *   └──┬ chaki-test-module-B-1
+ *      ├── chaki-test-module-B-1-a
+ *      └── chaki-test-module-B-1-b   
  */
 var mockApi = {
-    moduleA :  {
+    'chaki-test-module-A' :  {
         data : 
             { ID: 20,
               Class: 'Chaki\\Package',
@@ -34,7 +38,7 @@ var mockApi = {
               README: null 
             }
     },
-    moduleB : {
+    'chaki-test-module-B' : {
         data : 
             { ID: 20,
               Class: 'Chaki\\Package',
@@ -45,8 +49,67 @@ var mockApi = {
               Description: null,
               README: null 
             }
-        }
-
+      },
+    'chaki-test-module-A-1' : {
+        data : 
+            { ID: 20,
+              Class: 'Chaki\\Package',
+              Created: 1433185986,
+              CreatorID: 5,
+              Handle: 'chaki-test-module-A-1',
+              GitHubPath: testGitRepo + '/chaki-test-module-A-1',
+              Description: null,
+              README: null 
+            }
+      },
+    'chaki-test-module-A-2' : {
+        data : 
+            { ID: 20,
+              Class: 'Chaki\\Package',
+              Created: 1433185986,
+              CreatorID: 5,
+              Handle: 'chaki-test-module-A-2',
+              GitHubPath: testGitRepo + '/chaki-test-module-A-2',
+              Description: null,
+              README: null 
+            }
+      },
+    'chaki-test-module-B-1' : {
+        data : 
+            { ID: 20,
+              Class: 'Chaki\\Package',
+              Created: 1433185986,
+              CreatorID: 5,
+              Handle: 'chaki-test-module-N-1',
+              GitHubPath: testGitRepo + '/chaki-test-module-B-1',
+              Description: null,
+              README: null 
+            }
+      },
+    'chaki-test-module-B-1-a' : {
+        data : 
+            { ID: 20,
+              Class: 'Chaki\\Package',
+              Created: 1433185986,
+              CreatorID: 5,
+              Handle: 'chaki-test-module-B-1-a',
+              GitHubPath: testGitRepo + '/chaki-test-module-B-1-a',
+              Description: null,
+              README: null 
+            }
+      },
+    'chaki-test-module-B-1-b' : {
+        data : 
+            { ID: 20,
+              Class: 'Chaki\\Package',
+              Created: 1433185986,
+              CreatorID: 5,
+              Handle: 'chaki-test-module-B-1-b',
+              GitHubPath: testGitRepo + '/chaki-test-module-B-1-b',
+              Description: null,
+              README: null 
+            }
+      }
 };
 
 var testChakiRuns = function (test) {
@@ -122,9 +185,20 @@ var testInstall = function (test) {
   });
 };
 
+// @@TODO write unit test for Install._getPackageInstallPath()
+// var  = function (test) {
+//     console.error("TEST 4");
+//     chaki.args.app = testModulePath;
+//     var cmds = chaki._loadCmdProperties();
+//     var Install = require()
+//     chaki.workspaceDir = cmds['workspace.packages.dir'];
+
+
+//     chaki.init({app :})
+// };
 
 // module.exports.testChakiRuns = testChakiRuns;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-module.exports.testGetBuildXML = testGetBuildXML;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+// module.exports.testGetBuildXML = testGetBuildXML;
 module.exports.testInstall = testInstall;
