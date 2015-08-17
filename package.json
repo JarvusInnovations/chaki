@@ -7,10 +7,11 @@
     "url": "https://github.com/JarvusInnovations/chaki"
   },
   "dependencies": {
-    "restler": "*",
     "minimist": "*",
-    "shelljs": "*",
+    "nodegit": "^0.4.1",
+    "restler": "*",
     "rimraf": "~2.4.2",
+    "shelljs": "*",
     "underscore": "~1.8.3"
   },
   "bin": "./chaki.js"

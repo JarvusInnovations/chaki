@@ -14,12 +14,12 @@ var chakiApp = chakiApp || {
     init : function (opts) {
         that = this;
         this.args = opts.args || argv;
-
+        this.curPath = path.resolve(process.cwd());
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
         console.error("[chaki] init - ", this.args);
-        console.error("[chaki] init - 1", this.workspacePackagesPath);
+        console.error("[chaki] init - 1", path.resolve(process.cwd()));
         if (this.commands[command]) {
             this.commands[command](opts);
         } else {
@@ -28,12 +28,15 @@ var chakiApp = chakiApp || {
         }
     },
 
+    // cache some stuff
+    _cache : {},
+
     _getAppJsonPath : function (packagePath) {
         var outPath;
         console.log("[app] _getAppJsonPath", packagePath, this.args.app);
         // if nothing is passed, use working directory
         if (!packagePath) {
-            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, 'app.json') : path.resolve(__dirname, './app.json');
+            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, 'app.json') : path.resolve(this.curPath, './app.json');
         } else {  // otherwise, we're in a package directory looking for dependencies
             outPath = path.resolve(packagePath);
         }
@@ -48,12 +51,18 @@ var chakiApp = chakiApp || {
         // if nothing is passed, use working directory
         if (!componentPath) {
             console.log('>>', this.args.app);
-            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(__dirname, './build.xml');
+            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
         } else { // otherwise, we're in a package directory looking for dependencies
             outPath = path.resolve(componentPath) + '/build.xml';
         }
         console.error("_getBuildXMLPath", outPath);
         return outPath;
+    },
+
+    getSenchaInfo : function () {
+        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
+        console.error("AAHHH",data);
+        return data;
     },
 
     _getAppDir : function () {
@@ -90,7 +99,9 @@ var chakiApp = chakiApp || {
         }
     },
 
+    // @@TODO cache this stuff in memory
     _loadAppProperties : function (appJsonPath) {
+
         console.error('Loading app configuration from ' + appJsonPath + '...');
 
         if (!fs.existsSync(appJsonPath)) {
@@ -112,7 +123,8 @@ var chakiApp = chakiApp || {
         return jsonObject;
     },
 
-    _loadCmdProperties : function (componentPath) {
+    // @@TODO cache this stuff in memory
+    _loadCmdProperties : function (componentPath, props) {
         console.error('Loading Sencha CMD configuration...');
         var  buildXMLPath = this._getBuildXMLPath(componentPath);
 
@@ -130,6 +142,7 @@ var chakiApp = chakiApp || {
             shell.cd(this.args.app);
         }
 
+
         // try to recover gracefully if there's an issue with sencha cmd
         try {
             var properties = {},
@@ -142,6 +155,11 @@ var chakiApp = chakiApp || {
             }
 
             console.error('Loaded ' + Object.keys(properties).length + ' properties.');
+            
+            if (props) {
+                return _.pick(properties, props);
+            }
+
             return properties;
         } catch (e) {
             console.error("Error loading Sencha Cmd", e);
@@ -164,7 +182,7 @@ var chakiApp = chakiApp || {
         // get dependencies base directory
         // for each 
     },
-
+    
     //
     _getWorkspacePackagesPath : function (cmdProperties) {
         var path = cmdProperties['workspace.packages.dir'];

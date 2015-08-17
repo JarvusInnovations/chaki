@@ -166,11 +166,22 @@ var testGetBuildXML = function (test) {
 
 
 var testInstall = function (test) {
+  console.error("TEST 5");
   var pkgDir = 'testApp/sencha-workspace/packages/';
   var pkgPath = path.resolve(__dirname, pkgDir);
-  test.expect(1);
+
+  test.expect(14);
+
   // remove old packages from test app packageDir
   rmdir(pkgPath, function () {
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A') === false , "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-1') === false, "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-2') === false, "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B') === false, "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/module-B-1') === false, "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/module-B-1/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-a') === false, "dep no exist");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/module-B-1/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-b') === false, "dep no exist");
+
       // put it back
       fs.mkdirSync(pkgPath);
       console.log("111");
@@ -179,12 +190,37 @@ var testInstall = function (test) {
           method : "test",
           mockApi : mockApi,
           args : {
-              app : 'test/testApp/sencha-workspace/SlateAdmin/'
+              app : '/var/dev/chaki/test/testApp/sencha-workspace/SlateAdmin'
           }
       });
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A'), pkgPath +"/dep exist 1");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-1'), pkgPath +"/dep exist 2");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-2'), pkgPath +"/dep exist 3");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B'), pkgPath +"/dep exist 4");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1'), pkgPath +"/dep exist 5");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-a'), pkgPath +"/dep exist 6");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-b'), pkgPath +"/dep exist 7");
+      test.done();
   });
 };
 
+var testGetPackageInstallPath = function () {
+  var testWritten = false;
+  test.ok(testWritten === true, "Write testGetPackageInstallPath");
+  test.done();
+};
+
+var testGetSenchaVersion = function (test) {
+  chaki.init({
+    command : "test",
+    args : {
+      app : testModulePath
+    }
+  });
+
+  console.error(chaki.getSenchaInfo());
+  test.done();
+};
 // @@TODO write unit test for Install._getPackageInstallPath()
 // var  = function (test) {
 //     console.error("TEST 4");
@@ -197,8 +233,10 @@ var testInstall = function (test) {
 //     chaki.init({app :})
 // };
 
-// module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
-// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-// module.exports.testGetBuildXML = testGetBuildXML;
+module.exports.testChakiRuns = testChakiRuns;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+module.exports.testGetBuildXML = testGetBuildXML;
 module.exports.testInstall = testInstall;
+module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
+module.exports.testGetSenchaVersion = testGetSenchaVersion;
