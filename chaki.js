@@ -59,16 +59,6 @@ var chakiApp = chakiApp || {
         return outPath;
     },
 
-    getSenchaInfo : function () {
-        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
-        console.error("AAHHH",data);
-        return data;
-    },
-
-    _getAppDir : function () {
-
-    },
-
     commands : {
         install : function (opts) {
             console.error("[chaki] Do install");
@@ -199,6 +189,11 @@ var chakiApp = chakiApp || {
         return path;
     },
 
+    getSenchaInfo : function () {
+        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
+        return data;
+    },
+    
     _camelCased : function (str) {
         if (str) {
             return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });

@@ -204,13 +204,15 @@ var testInstall = function (test) {
   });
 };
 
-var testGetPackageInstallPath = function () {
+var testGetPackageInstallPath = function (test) {
   var testWritten = false;
   test.ok(testWritten === true, "Write testGetPackageInstallPath");
   test.done();
 };
 
 var testGetSenchaVersion = function (test) {
+  var senchaData;
+
   chaki.init({
     command : "test",
     args : {
@@ -218,7 +220,10 @@ var testGetSenchaVersion = function (test) {
     }
   });
 
-  console.error(chaki.getSenchaInfo());
+  senchaData = chaki.getSenchaData();
+
+  test.ok(senchaData['app.framework.version'].split(".").length > 3);
+  test.ok(['ext', 'touch'].indexOf(senchaData['app.framework']) >= 0);
   test.done();
 };
 // @@TODO write unit test for Install._getPackageInstallPath()
@@ -233,10 +238,10 @@ var testGetSenchaVersion = function (test) {
 //     chaki.init({app :})
 // };
 
-module.exports.testChakiRuns = testChakiRuns;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-module.exports.testGetBuildXML = testGetBuildXML;
+// module.exports.testChakiRuns = testChakiRuns;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+// module.exports.testGetBuildXML = testGetBuildXML;
 module.exports.testInstall = testInstall;
-module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
-module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
+// module.exports.testGetSenchaVersion = testGetSenchaVersion;
