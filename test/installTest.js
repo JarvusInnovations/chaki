@@ -2,6 +2,7 @@ var chaki = require('../chaki'),
     path = require('path'),
     shell = require('shelljs'),
     rmdir = require('rimraf'),
+    _ = require('underscore'),
     fs = require('fs'),
     testModulePath = __dirname + '/testApp/sencha-workspace/SlateAdmin/',
     testGithubAcct = "starsinmypockets";
@@ -274,14 +275,29 @@ testGitGetBranches = function (test) {
     test.done();
 };
 
-module.exports.testGitGetBranches = testGitGetBranches;
 
 testGitCheckout = function (test) {
     var Install = require(__dirname + '/../lib/install');
+
+    // setup repo
     var data = {
       path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
       dest : __dirname + '/testGitRepo'
     };
+
+    rmdir(data.dest, function () {
+      Install._gitCloneRepo(data);
+      var result = Install._gitCheckoutBranch({path : data.dest, branch : 'test2'});
+
+      _.each(result, function (r) {
+        test.ok(r.code === 0, r + 'status ok');
+      });
+      test.ok(fs.existsSync(data.dest + '/test2'), data.dest + '/test2 exists');
+      test.ok(!fs.existsSync(data.dest + '/test21'), data.dest + '/test21 NO EXIST');
+      test.ok(!fs.existsSync(data.dest + '/test1'), data.dest + '/test1 not present');
+
+      test.done();    
+    });
 };
 
 testFindBestBranch = function (test) {
@@ -297,13 +313,18 @@ testFindBestBranch = function (test) {
 
   data.dest = __dirname + '/testGitRepo';
   data.senchaInfo = chaki.getSenchaInfo();
-  console.log(data);
 
-//  Install._findBestBranch(data);
+  var result = Install._findBestBranch(data);
+  console.log("fbb 1", result);
   test.done();
+
+  // @@TODO:
+  // implement search algorithm
+  // add branches to test repo to reflect real life use cases
+  // integrate at install.js
+  // move git stuff to lib/git.js
 };
 
-module.exports.testFindBestBranch = testFindBestBranch;
 // @@TODO write unit test for Install._getPackageInstallPath()
 // var  = function (test) {
 //     console.error("TEST 4");
@@ -320,9 +341,11 @@ module.exports.testFindBestBranch = testFindBestBranch;
 // module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 // module.exports.testGetBuildXML = testGetBuildXML;
+//module.exports.testGitGetBranches = testGitGetBranches;
 // module.exports.testInstall = testInstall;
- // module.exports.tesGitClone = tesGitClone;
- // module.exports.testGitCheckout = testGitCheckout;
+//  module.exports.tesGitClone = tesGitClone;
+// module.exports.testFindBestBranch = testFindBestBranch;
+ module.exports.testGitCheckout = testGitCheckout;
 // module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
 // module.exports.testGetSenchaVersion = testGetSenchaVersion;
 // module.exports.testGetBranches = testGetBranches;
