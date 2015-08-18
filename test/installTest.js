@@ -4,7 +4,7 @@ var chaki = require('../chaki'),
     rmdir = require('rimraf'),
     fs = require('fs'),
     testModulePath = 'test/testApp/sencha-workspace/SlateAdmin/',
-    testGitRepo = "starsinmypockets";
+    testGithubAcct = "starsinmypockets";
 
 // snitch on uncaught exceptions please
 process.on('uncaughtException', function(err) {
@@ -33,7 +33,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-A',
-              GitHubPath: testGitRepo + '/chaki-test-module-A',
+              GitHubPath: testGithubAcct + '/chaki-test-module-A',
               Description: null,
               README: null 
             }
@@ -45,7 +45,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-B',
-              GitHubPath: testGitRepo + '/chaki-test-module-B',
+              GitHubPath: testGithubAcct + '/chaki-test-module-B',
               Description: null,
               README: null 
             }
@@ -57,7 +57,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-A-1',
-              GitHubPath: testGitRepo + '/chaki-test-module-A-1',
+              GitHubPath: testGithubAcct + '/chaki-test-module-A-1',
               Description: null,
               README: null 
             }
@@ -69,7 +69,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-A-2',
-              GitHubPath: testGitRepo + '/chaki-test-module-A-2',
+              GitHubPath: testGithubAcct + '/chaki-test-module-A-2',
               Description: null,
               README: null 
             }
@@ -81,7 +81,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-N-1',
-              GitHubPath: testGitRepo + '/chaki-test-module-B-1',
+              GitHubPath: testGithubAcct + '/chaki-test-module-B-1',
               Description: null,
               README: null 
             }
@@ -93,7 +93,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-B-1-a',
-              GitHubPath: testGitRepo + '/chaki-test-module-B-1-a',
+              GitHubPath: testGithubAcct + '/chaki-test-module-B-1-a',
               Description: null,
               README: null 
             }
@@ -105,7 +105,7 @@ var mockApi = {
               Created: 1433185986,
               CreatorID: 5,
               Handle: 'chaki-test-module-B-1-b',
-              GitHubPath: testGitRepo + '/chaki-test-module-B-1-b',
+              GitHubPath: testGithubAcct + '/chaki-test-module-B-1-b',
               Description: null,
               README: null 
             }
@@ -226,6 +226,13 @@ var testGetSenchaVersion = function (test) {
   test.ok(['ext', 'touch'].indexOf(senchaData['app.framework']) >= 0);
   test.done();
 };
+
+testGetBranches = function (test) {
+  var Install = require('lib/install');
+
+  test.done();
+};
+
 // @@TODO write unit test for Install._getPackageInstallPath()
 // var  = function (test) {
 //     console.error("TEST 4");
@@ -242,6 +249,7 @@ var testGetSenchaVersion = function (test) {
 // module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 // module.exports.testGetBuildXML = testGetBuildXML;
-module.exports.testInstall = testInstall;
+ module.exports.testInstall = testInstall;
 // module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
 // module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testGetBranches = testGetBranches;
