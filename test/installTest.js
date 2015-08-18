@@ -3,7 +3,7 @@ var chaki = require('../chaki'),
     shell = require('shelljs'),
     rmdir = require('rimraf'),
     fs = require('fs'),
-    testModulePath = 'test/testApp/sencha-workspace/SlateAdmin/',
+    testModulePath = __dirname + '/testApp/sencha-workspace/SlateAdmin/',
     testGithubAcct = "starsinmypockets";
 
 // snitch on uncaught exceptions please
@@ -282,21 +282,28 @@ testGitCheckout = function (test) {
       path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
       dest : __dirname + '/testGitRepo'
     };
+};
 
+testFindBestBranch = function (test) {
+  var Install = require(__dirname + '/../lib/install');
+  var data = {};
 
-    // var data2 = {
-    //   path = data.path,
-    //   branch = test2
-    // };
+  chaki.init({
+    command : "test",
+    args : {
+      app : testModulePath
+    }
+  });
 
-    // rmdir(data.dest, function () {
-    //   Install._gitCloneRepo(data);
-    //   Install._gitCheckoutVersion(data2);
-    //   test.ok(1);  
-    //   test.done();
-    // });
-  };
+  data.dest = __dirname + '/testGitRepo';
+  data.senchaInfo = chaki.getSenchaInfo();
+  console.log(data);
 
+//  Install._findBestBranch(data);
+  test.done();
+};
+
+module.exports.testFindBestBranch = testFindBestBranch;
 // @@TODO write unit test for Install._getPackageInstallPath()
 // var  = function (test) {
 //     console.error("TEST 4");
