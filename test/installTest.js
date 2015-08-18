@@ -300,7 +300,7 @@ testGitCheckout = function (test) {
     });
 };
 
-testFindBestBranch = function (test) {
+testGetBestBranch = function (test) {
   var Git = require(__dirname + '/../lib/git');
   var data = {};
 
@@ -314,7 +314,7 @@ testFindBestBranch = function (test) {
   data.dest = __dirname + '/testGitRepo';
   data.senchaInfo = chaki.getSenchaInfo();
 
-  var result = Git._findBestBranch(data);
+  var result = Git._getBestBranch(data);
   console.log("fbb 1", result);
   test.done();
 
@@ -350,10 +350,10 @@ testFindBestBranch = function (test) {
 /**
  * Git Stuff 
  */
- module.exports.tesGitClone = tesGitClone;
- module.exports.testFindBestBranch = testFindBestBranch;
- module.exports.testGitCheckout = testGitCheckout;
-// module.exports.testFindBestBranch = testFindBestBranch;
+ // module.exports.tesGitClone = tesGitClone;
+ // module.exports.testFindBestBranch = testFindBestBranch;
+ // module.exports.testGitCheckout = testGitCheckout;
+ module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
