@@ -229,7 +229,7 @@ var testGetSenchaVersion = function (test) {
 };
 
 tesGitClone = function (test) {
-    var Install = require(__dirname + '/../lib/install');
+    var Git = require(__dirname + '/../lib/git');
     
     // test good
     var data = {
@@ -238,7 +238,7 @@ tesGitClone = function (test) {
     };
 
     rmdir(data.dest, function () {
-      var code = Install._gitCloneRepo(data);
+      var code = Git._gitCloneRepo(data);
       test.ok(code === 0);
       test.ok(fs.existsSync(data.dest));
       test.ok(fs.existsSync(data.dest+'/README.md'));
@@ -259,7 +259,7 @@ tesGitClone = function (test) {
 };
 
 testGitGetBranches = function (test) {
-    var Install = require(__dirname + '/../lib/install');
+    var Git = require(__dirname + '/../lib/git');
 
     // test good
     var data = {
@@ -267,8 +267,8 @@ testGitGetBranches = function (test) {
       dest : __dirname + '/testGitRepo'
     };
 
-    Install._gitCloneRepo(data);
-    var out = Install._gitGetAllBranches(data);
+    Git._gitCloneRepo(data);
+    var out = Git._gitGetAllBranches(data);
     test.ok(out.indexOf('master') >= 0);
     test.ok(out.indexOf('origin/test1') >= 0);
     console.log("TGGA 1", out);
@@ -277,7 +277,7 @@ testGitGetBranches = function (test) {
 
 
 testGitCheckout = function (test) {
-    var Install = require(__dirname + '/../lib/install');
+    var Git = require(__dirname + '/../lib/git');
 
     // setup repo
     var data = {
@@ -286,8 +286,8 @@ testGitCheckout = function (test) {
     };
 
     rmdir(data.dest, function () {
-      Install._gitCloneRepo(data);
-      var result = Install._gitCheckoutBranch({path : data.dest, branch : 'test2'});
+      Git._gitCloneRepo(data);
+      var result = Git._gitCheckoutBranch({path : data.dest, branch : 'test2'});
 
       _.each(result, function (r) {
         test.ok(r.code === 0, r + 'status ok');
@@ -301,7 +301,7 @@ testGitCheckout = function (test) {
 };
 
 testFindBestBranch = function (test) {
-  var Install = require(__dirname + '/../lib/install');
+  var Git = require(__dirname + '/../lib/git');
   var data = {};
 
   chaki.init({
@@ -314,7 +314,7 @@ testFindBestBranch = function (test) {
   data.dest = __dirname + '/testGitRepo';
   data.senchaInfo = chaki.getSenchaInfo();
 
-  var result = Install._findBestBranch(data);
+  var result = Git._findBestBranch(data);
   console.log("fbb 1", result);
   test.done();
 
@@ -337,15 +337,25 @@ testFindBestBranch = function (test) {
 //     chaki.init({app :})
 // };
 
+/*
+ * Chaki unit tests
+ */
 // module.exports.testChakiRuns = testChakiRuns;
 // module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 // module.exports.testGetBuildXML = testGetBuildXML;
-//module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testInstall = testInstall;
-//  module.exports.tesGitClone = tesGitClone;
-// module.exports.testFindBestBranch = testFindBestBranch;
- module.exports.testGitCheckout = testGitCheckout;
-// module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
+// module.exports.testGitGetBranches = testGitGetBranches;
 // module.exports.testGetSenchaVersion = testGetSenchaVersion;
-// module.exports.testGetBranches = testGetBranches;
+
+/**
+ * Git Stuff 
+ */
+ module.exports.tesGitClone = tesGitClone;
+ module.exports.testFindBestBranch = testFindBestBranch;
+ module.exports.testGitCheckout = testGitCheckout;
+// module.exports.testFindBestBranch = testFindBestBranch;
+
+/*
+ * Installer
+ */
+ // module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
