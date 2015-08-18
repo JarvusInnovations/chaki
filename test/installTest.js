@@ -227,11 +227,75 @@ var testGetSenchaVersion = function (test) {
   test.done();
 };
 
-testGetBranches = function (test) {
-  var Install = require('lib/install');
+tesGitClone = function (test) {
+    var Install = require(__dirname + '/../lib/install');
+    
+    // test good
+    var data = {
+      path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
+      dest : __dirname + '/testGitRepo'
+    };
 
-  test.done();
+    rmdir(data.dest, function () {
+      var code = Install._gitCloneRepo(data);
+      test.ok(code === 0);
+      test.ok(fs.existsSync(data.dest));
+      test.ok(fs.existsSync(data.dest+'/README.md'));
+
+      // test bad
+      // var badData = {
+      //   path : 'https://github.com/' + testGithubAcct + '/repo-no-existy',
+      //   dest : __dirname + '/test/noExists'
+      // };
+
+      // var bad = Install._gitCloneRepo(badData);
+      // test.ok(code !== 0);
+      // test.ok(!fs.existsSync(badData.dest));
+
+      test.done();      
+    });
+
 };
+
+testGitGetBranches = function (test) {
+    var Install = require(__dirname + '/../lib/install');
+
+    // test good
+    var data = {
+      path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
+      dest : __dirname + '/testGitRepo'
+    };
+
+    Install._gitCloneRepo(data);
+    var out = Install._gitGetAllBranches(data);
+    test.ok(out.indexOf('master') >= 0);
+    test.ok(out.indexOf('origin/test1') >= 0);
+    console.log("TGGA 1", out);
+    test.done();
+};
+
+module.exports.testGitGetBranches = testGitGetBranches;
+
+testGitCheckout = function (test) {
+    var Install = require(__dirname + '/../lib/install');
+    var data = {
+      path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
+      dest : __dirname + '/testGitRepo'
+    };
+
+
+    // var data2 = {
+    //   path = data.path,
+    //   branch = test2
+    // };
+
+    // rmdir(data.dest, function () {
+    //   Install._gitCloneRepo(data);
+    //   Install._gitCheckoutVersion(data2);
+    //   test.ok(1);  
+    //   test.done();
+    // });
+  };
 
 // @@TODO write unit test for Install._getPackageInstallPath()
 // var  = function (test) {
@@ -249,7 +313,9 @@ testGetBranches = function (test) {
 // module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 // module.exports.testGetBuildXML = testGetBuildXML;
- module.exports.testInstall = testInstall;
+// module.exports.testInstall = testInstall;
+ // module.exports.tesGitClone = tesGitClone;
+ // module.exports.testGitCheckout = testGitCheckout;
 // module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
 // module.exports.testGetSenchaVersion = testGetSenchaVersion;
 // module.exports.testGetBranches = testGetBranches;
