@@ -7,7 +7,7 @@ var chaki = require('../chaki'),
     testModulePath = __dirname + '/testApp/sencha-workspace/SlateAdmin/',
     testGithubAcct = "starsinmypockets";
 
-// snitch on uncaught exceptions please
+// report uncaught exceptions please
 process.on('uncaughtException', function(err) {
   console.error(err.stack);
 });
@@ -221,7 +221,7 @@ var testGetSenchaVersion = function (test) {
     }
   });
 
-  senchaData = chaki.getSenchaData();
+  senchaData = chaki.getSenchaInfo();
 
   test.ok(senchaData['app.framework.version'].split(".").length > 3);
   test.ok(['ext', 'touch'].indexOf(senchaData['app.framework']) >= 0);
@@ -317,43 +317,25 @@ testGetBestBranch = function (test) {
   var result = Git._getBestBranch(data);
   console.log("fbb 1", result);
   test.done();
-
-  // @@TODO:
-  // implement search algorithm
-  // add branches to test repo to reflect real life use cases
-  // integrate at install.js
-  // move git stuff to lib/git.js
 };
-
-// @@TODO write unit test for Install._getPackageInstallPath()
-// var  = function (test) {
-//     console.error("TEST 4");
-//     chaki.args.app = testModulePath;
-//     var cmds = chaki._loadCmdProperties();
-//     var Install = require()
-//     chaki.workspaceDir = cmds['workspace.packages.dir'];
-
-
-//     chaki.init({app :})
-// };
 
 /*
  * Chaki unit tests
  */
-// module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
-// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-// module.exports.testGetBuildXML = testGetBuildXML;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetSenchaVersion = testGetSenchaVersion;
+module.exports.testChakiRuns = testChakiRuns;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+module.exports.testGetBuildXML = testGetBuildXML;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetSenchaVersion = testGetSenchaVersion;
 
 /**
  * Git Stuff 
  */
- // module.exports.tesGitClone = tesGitClone;
- // module.exports.testGitCheckout = testGitCheckout;
- // module.exports.testGitGetBranches = testGitGetBranches;
- // module.exports.testGetBestBranch = testGetBestBranch;
+ module.exports.tesGitClone = tesGitClone;
+ module.exports.testGitCheckout = testGitCheckout;
+ module.exports.testGitGetBranches = testGitGetBranches;
+ module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
