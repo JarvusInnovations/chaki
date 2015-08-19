@@ -350,12 +350,12 @@ testGetBestBranch = function (test) {
 /**
  * Git Stuff 
  */
- module.exports.tesGitClone = tesGitClone;
- module.exports.testGitCheckout = testGitCheckout;
- module.exports.testGitGetBranches = testGitGetBranches;
- module.exports.testGetBestBranch = testGetBestBranch;
+ // module.exports.tesGitClone = tesGitClone;
+ // module.exports.testGitCheckout = testGitCheckout;
+ // module.exports.testGitGetBranches = testGitGetBranches;
+ // module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
  */
- // module.exports.testGetPackageInstallPath = testGetPackageInstallPath;
+module.exports.testInstall = testInstall;

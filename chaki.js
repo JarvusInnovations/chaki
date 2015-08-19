@@ -45,6 +45,18 @@ var chakiApp = chakiApp || {
         return outPath;
     },
 
+    getAppJsonPath : function (packagePath) {
+        var path;
+        if (packagePath) {
+            path = packagePath + '/package.json';
+        } else {
+            path = (this.args.app)  ? this.args.app + '/app.json' : __dirname + '/app.json';
+        }
+
+        console.log("[chaki] getAppJson", path);
+        return path;
+    },
+
     _getBuildXMLPath : function (componentPath) {
         console.error("[chaki] _getBuildXMLPath", componentPath, this.args.app);
         var outPath;
