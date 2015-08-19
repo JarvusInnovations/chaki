@@ -15,11 +15,11 @@ var chakiApp = chakiApp || {
         that = this;
         this.args = opts.args || argv;
         this.curPath = path.resolve(process.cwd());
-        this._loadCmdProperties(); 
-        
+
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
+        this._loadCmdProperties(); 
         console.error("[chaki] init - ", this.args);
         console.error("[chaki] init - 1", path.resolve(process.cwd()));
         if (this.commands[command]) {
