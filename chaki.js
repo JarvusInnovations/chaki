@@ -11,6 +11,7 @@ var fs = require('fs'),
 var chakiApp = chakiApp || {
     registryUrl : "http://chaki.io/packages/", // API providing package registry information
     depDirMode : 0755, // @@TODO what file mode we want here?
+
     init : function (opts) {
         that = this;
         this.args = opts.args || argv;
@@ -19,7 +20,6 @@ var chakiApp = chakiApp || {
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
-        this._loadCmdProperties(); 
         console.error("[chaki] init - ", this.args);
         console.error("[chaki] init - 1", path.resolve(process.cwd()));
         if (this.commands[command]) {
@@ -28,39 +28,6 @@ var chakiApp = chakiApp || {
             console.error("Invalid command " + command);
             console.error('Usage: chaki command [package]');
         }
-    },
-
-    // cache some stuff
-    _cache : {},
-
-    _getAppJsonPath : function (packagePath) {
-        var outPath;
-        console.log("[app] _getAppJsonPath", packagePath, this.args.app);
-        // if nothing is passed, use working directory
-        if (!packagePath) {
-            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, 'app.json') : path.resolve(this.curPath, './app.json');
-        } else {  // otherwise, we're in a package directory looking for dependencies
-            outPath = path.resolve(packagePath);
-        }
-
-        console.error("_getAppJsonPath", outPath);
-        return outPath;
-    },
-
-    getAppJsonPath : function (packagePath) {
-        var path;
-        if (packagePath) {
-            path = packagePath + '/package.json';
-        } else {
-            path = (this.args.app)  ? this.args.app + '/app.json' : __dirname + '/app.json';
-        }
-
-        console.log("[chaki] getAppJson", path);
-        return path;
-    },
-
-    _getBuildXMLPath : function () {
-        return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
     },
 
     commands : {
@@ -79,7 +46,7 @@ var chakiApp = chakiApp || {
 
         dumpAppProps : function () {
             console.error("[chaki] Do dump app props");
-            var path = that._getAppJsonPath();
+            var path = that.getAppJsonPath();
             console.error(JSON.stringify(that._loadAppProperties(path), null, 4));
         },
 
@@ -93,7 +60,33 @@ var chakiApp = chakiApp || {
         }
     },
 
-    // @@TODO cache this stuff in memory
+    /**
+     * GETTERS
+     **/
+    getAppJsonPath : function (packagePath) {
+        var path;
+        if (packagePath) {
+            path = packagePath + '/package.json';
+        } else {
+            path = (this.args.app)  ? this.args.app + '/app.json' : this.curPath + '/app.json';
+        }
+
+        console.log("[chaki] getAppJson", path);
+        return path;
+    },
+
+    getSenchaInfo : function () {
+        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
+        return data;
+    },
+    
+    /**
+     * PRIVATES
+     **/
+    _getBuildXMLPath : function () {
+        return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
+    },
+
     _loadAppProperties : function (appJsonPath) {
 
         console.error('Loading app configuration from ' + appJsonPath + '...');
@@ -117,7 +110,6 @@ var chakiApp = chakiApp || {
         return jsonObject;
     },
 
-    // @@TODO cache this stuff in memory
     _loadCmdProperties : function (props) {
         console.error('Loading Sencha CMD configuration...');
         var buildXMLPath = this._getBuildXMLPath(),
@@ -125,8 +117,7 @@ var chakiApp = chakiApp || {
 
         // check first for locally stored values
         if (this.cmdProperties) {
-            console.log('[chaki] Serving stored values');
-            return this.cmdProperties;
+            return (props) ? _.pick(this.cmdProperties, props) : this.cmdProperties;
         }
 
         // or recompute....
@@ -171,23 +162,6 @@ var chakiApp = chakiApp || {
         }
     },
 
-    getWorkspacePackagesPath : function (opts) {
-        console.error('[App] gwspp 1', opts);
-        var workspacePath = __dirname + '';
-        if (opts.parents) {
-            _.each(opts.parents, function (parent) {
-                path = path.concat(parent + '/packages/');
-            });
-        }
-
-        console.error('[App] gwspp 1', path.resolve(workspacePath));
-
-        return path.resolve(workspacePath);
-        // get dependencies base directory
-        // for each 
-    },
-    
-    //
     _getWorkspacePackagesPath : function (cmdProperties) {
         var path = cmdProperties['workspace.packages.dir'];
         console.error("_workspacePath", path);
@@ -203,17 +177,14 @@ var chakiApp = chakiApp || {
         return path;
     },
 
-    getSenchaInfo : function () {
-        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
-        return data;
-    },
-    
+    /**
+     * Util
+     **/
     _camelCased : function (str) {
         if (str) {
             return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
         }
     }
-
 };
 
 
