@@ -117,7 +117,7 @@ var mockApi = {
 var testChakiRuns = function (test) {
     console.error("TEST 1");
     test.expect(1);
-    chaki.init({
+    module.chaki.init({
         command : 'test',
         args : {}
     });
@@ -126,51 +126,70 @@ var testChakiRuns = function (test) {
 };
 
 testChakiCurDir = function (test) {
-    chaki.init({
+    module.chaki.init({
         command : 'test',
         args : {}
     });
     console.log("CURDIR", __dirname);
-    test.ok(haki.curPath == path.resolve(__dirname, '..'));
+    test.ok(module.chaki.curPath == path.resolve(__dirname, '..'));
     test.done();
 };
 
 
 var testGetAppJsonPath = function (test) {
-    chaki.init({
+    module.chaki.init({
         command : 'test',
         args : {}
     });
-    var jsonPath = chaki.getAppJsonPath();
-    console.error("TEST 2", jsonPath, chaki.args);
+    console.log("AA", module.chaki.args);
+    var jsonPath = module.chaki.getAppJsonPath();
+    console.log("AA", module.chaki.args, jsonPath);
     test.ok(path.resolve(jsonPath) === path.resolve(__dirname, '..', 'app.json'), "_getAppJsonPath should be the same as the chaki run if args.app not set");
   
     test.done();
 };
 
 var testGetBuildXMLPath = function (test) {
+  module.chaki.init({
+      command : 'test',
+      args : {
+        app : "path/to/app"
+      }
+  });
+
+  // check with relative path
   var appPath = path.resolve(__dirname, '..');
-  var p1 = chaki._getBuildXMLPath();
+  var p = module.chaki._getBuildXMLPath();
 
-  // check from specified app dir
-  chaki.args.app = "path/to/app";
+  // check with no path given
+  module.chaki.args = {};
+  var p1 = module.chaki._getBuildXMLPath();
 
-  var p3 = chaki._getBuildXMLPath();
-  console.log(p1, p3);
+  // check with absolute path
+  module.chaki.args.app = path.resolve(__dirname, '..', 'path/to/app');
+  var p2 = module.chaki._getBuildXMLPath();
 
-  test.ok(p1 === appPath + '/build.xml');
-  test.ok(p3 === appPath + '/path/to/app/build.xml');
+  console.log(p, p1);
+
+  test.ok(p === appPath + '/path/to/app/build.xml', "make path from relative path");
+  test.ok(p1 === appPath + '/build.xml', "make path when no oath given");
+  test.ok(p2 === appPath + '/path/to/app/build.xml', "make path from absolute path");
 
   test.done();
 };
 
 // givn path to a bujild.xml, this should kick out properties from sencha
 var testGetBuildXML = function (test) {
+    module.chaki.init({
+        command : 'test',
+        args : {
+          app : testModulePath
+        }
+    });
     console.error("TEST 4");
-    chaki.args.app = testModulePath;
-    var cmds = chaki._loadCmdProperties();
+    var cmds = module.chaki._loadCmdProperties();
     var workspaceDir = cmds['workspace.packages.dir'];
-    var path = chaki._getWorkspacePackagesPath(cmds);
+    var path = module.chaki._getWorkspacePackagesPath(cmds);
     test.ok(fs.existsSync(path), "Path from _getWorkspacePackagesPath should exist");
     test.ok(typeof cmds === 'object');
     test.ok(typeof workspaceDir === "string");
@@ -201,7 +220,7 @@ var testInstall = function (test) {
       // put it back
       fs.mkdirSync(pkgPath);
       console.log("111");
-      chaki.init({
+      module.chaki.init({
           command : "install",
           method : "test",
           mockApi : mockApi,
@@ -229,14 +248,14 @@ var testGetPackageInstallPath = function (test) {
 var testGetSenchaVersion = function (test) {
   var senchaData;
 
-  chaki.init({
+  module.chaki.init({
     command : "test",
     args : {
       app : testModulePath
     }
   });
 
-  senchaData = chaki.getSenchaInfo();
+  senchaData = module.chaki.getSenchaInfo();
 
   test.ok(senchaData['app.framework.version'].split(".").length > 3);
   test.ok(['ext', 'touch'].indexOf(senchaData['app.framework']) >= 0);
@@ -245,7 +264,7 @@ var testGetSenchaVersion = function (test) {
 
 
 testCacheProps = function (test) {
-    chaki.init({
+    module.chaki.init({
       command : "test",
       args : {
         app : testModulePath
@@ -253,21 +272,20 @@ testCacheProps = function (test) {
     });
 
     var a = process.hrtime()[1];
-    chaki._loadCmdProperties();
+    module.chaki._loadCmdProperties();
     var b = process.hrtime()[1];
     var elapse1 = b - a;
 
     var a1 = process.hrtime()[1];
-    chaki._loadCmdProperties();
+    module.chaki._loadCmdProperties();
     var b1 = process.hrtime()[1];
     var elapse2 = b1 - a1;
 
-    test.ok(elapse2 * 10 < elapse1, "Getting chached properties is way faster");
-    test.ok(typeof chaki.cmdProperties === 'object', "Command properties stored as object");
+    test.ok(elapse2 < elapse1, "Getting chached properties is way faster");
+    test.ok(typeof module.chaki.cmdProperties === 'object', "Command properties stored as object");
     test.done();
 };
 
-module.exports.testCacheProps = testCacheProps;
     
 tesGitClone = function (test) {
     var Git = require(__dirname + '/../lib/git');
@@ -344,7 +362,7 @@ testGetBestBranch = function (test) {
   var Git = require(__dirname + '/../lib/git');
   var data = {};
 
-  chaki.init({
+  module.chaki.init({
     command : "test",
     args : {
       app : testModulePath
@@ -352,45 +370,54 @@ testGetBestBranch = function (test) {
   });
 
   data.dest = __dirname + '/testGitRepo';
-  data.senchaInfo = chaki.getSenchaInfo();
+  data.senchaInfo = module.chaki.getSenchaInfo();
 
   var result = Git.getBestBranch(data);
   console.log("fbb 1", result);
   test.done();
 };
 
+
+/**
+ * SETUP
+ */
 module.exports.setUp = function (cb) {
-  chaki = require('../chaki');
+  shell.cd(path.resolve(__dirname, '..'));
+  module.chaki = require('../chaki');
+  module.chaki.args = {};
   x++;
-  console.log("SETUP", chaki.args);
+  console.log("TEST " + x, module.chaki.args);
   cb();
 };
 
 module.exports.tearDown = function (cb) {
-    chaki = {};
-  console.log("TEARDOWN", chaki);
+  module.chaki = {};
+  console.log("TEARDOWN", module.chaki);
     cb();
 };
+
+
 /*
  * Chaki unit tests
  */
-// module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-// module.exports.testChakiCurDir = testChakiCurDir;
-// module.exports.testGetBuildXML = testGetBuildXML;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetSenchaVersion = testGetSenchaVersion;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testCacheProps = testCacheProps;
+module.exports.testChakiRuns = testChakiRuns;
+module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+module.exports.testChakiCurDir = testChakiCurDir;
+module.exports.testGetBuildXML = testGetBuildXML;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetSenchaVersion = testGetSenchaVersion;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
 
 // /**
 //  * Git Stuff 
 // //  */
- // module.exports.tesGitClone = tesGitClone;
- // module.exports.testGitCheckout = testGitCheckout;
- // module.exports.testGitGetBranches = testGitGetBranches;
- // module.exports.testGetBestBranch = testGetBestBranch;
+ module.exports.tesGitClone = tesGitClone;
+ module.exports.testGitCheckout = testGitCheckout;
+ module.exports.testGitGetBranches = testGitGetBranches;
+ module.exports.testGetBestBranch = testGetBestBranch;
 
 // /*
 //  * Installer
 //  */
- module.exports.testInstall = testInstall;
+// module.exports.testInstall = testInstall;
