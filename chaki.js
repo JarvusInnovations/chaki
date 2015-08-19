@@ -80,6 +80,15 @@ var chakiApp = chakiApp || {
         return data;
     },
     
+    getCmdProps : function (props) {
+        return this._loadCmdProperties(props);
+    },
+
+    getAppProps : function (props) {
+        console.log('111');
+        var path = this.getAppJsonPath();
+        return this._loadAppProperties(path, props);
+    },
     /**
      * PRIVATES
      **/
@@ -87,7 +96,7 @@ var chakiApp = chakiApp || {
         return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
     },
 
-    _loadAppProperties : function (appJsonPath) {
+    _loadAppProperties : function (appJsonPath, props) {
 
         console.error('Loading app configuration from ' + appJsonPath + '...');
 
@@ -105,6 +114,10 @@ var chakiApp = chakiApp || {
         jsonString = jsonString.replace(/([^\\])\\\./g, '$1\\\\.');
 
         var jsonObject = JSON.parse(jsonString);
+
+        if (props) {
+            return _.pick(jsonObject, props);
+        }
 
         console.error('Loaded ' + Object.keys(jsonObject).length + ' properties.');
         return jsonObject;

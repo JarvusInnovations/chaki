@@ -197,6 +197,7 @@ var testGetBuildXML = function (test) {
     test.done();
 };
 
+var test
 /**
  * This does a test install with a fake project 
  * with a fairly complex dependency structure
@@ -262,6 +263,36 @@ var testGetSenchaVersion = function (test) {
   test.done();
 };
 
+testGetAppProps = function (test) {
+    chaki.init({
+      command : "test",
+      args : {
+        app : testModulePath
+      }
+    });
+
+    var result = chaki.getAppProps(['id']);
+
+    console.log("tgap", result);
+
+    test.ok(result.id === "e21d2a04-1fe0-4793-a299-186188656a28");
+    test.done();
+};
+
+testGetCmdProps = function (test) {
+    chaki.init({
+      command : "test",
+      args : {
+        app : testModulePath
+      }
+    });
+    
+    var result = chaki.getCmdProps(['workspace.build.dir', 'user.name']);
+    console.log(result);
+    test.ok(result['user.name'] === 'paul');
+    test.ok(path.isAbsolute(result['workspace.build.dir']));
+    test.done();
+};
 
 testCacheProps = function (test) {
     chaki.init({
@@ -408,6 +439,8 @@ module.exports.testGetBuildXML = testGetBuildXML;
 module.exports.testGitGetBranches = testGitGetBranches;
 module.exports.testGetSenchaVersion = testGetSenchaVersion;
 module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testCmdAppProps = testGetCmdProps;
+module.exports.testGetAppProps = testGetAppProps;
 
 // /**
 //  * Git Stuff 
@@ -420,4 +453,4 @@ module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // /*
 //  * Installer
 //  */
- module.exports.testInstall = testInstall;
+module.exports.testInstall = testInstall;
