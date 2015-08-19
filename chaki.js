@@ -15,6 +15,7 @@ var chakiApp = chakiApp || {
         that = this;
         this.args = opts.args || argv;
         this.curPath = path.resolve(process.cwd());
+        this.buildXMLPath = this._
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
@@ -57,17 +58,8 @@ var chakiApp = chakiApp || {
         return path;
     },
 
-    _getBuildXMLPath : function (componentPath) {
-        console.error("[chaki] _getBuildXMLPath", componentPath, this.args.app);
-        var outPath;
-        
-        if (!componentPath) {
-            outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
-        } else { 
-            outPath = path.resolve(componentPath) + '/build.xml';
-        }
-        
-        return outPath;
+    _getBuildXMLPath : function () {
+        return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
     },
 
     commands : {
@@ -125,9 +117,9 @@ var chakiApp = chakiApp || {
     },
 
     // @@TODO cache this stuff in memory
-    _loadCmdProperties : function (componentPath, props) {
+    _loadCmdProperties : function (props) {
         console.error('Loading Sencha CMD configuration...');
-        var buildXMLPath = this._getBuildXMLPath(componentPath),
+        var buildXMLPath = this._getBuildXMLPath(),
             that = this;
 
         // check first for locally stored values
