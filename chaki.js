@@ -15,7 +15,8 @@ var chakiApp = chakiApp || {
         that = this;
         this.args = opts.args || argv;
         this.curPath = path.resolve(process.cwd());
-        this.buildXMLPath = this._
+        this._loadCmdProperties(); 
+        
         var command = opts.command || this._camelCased(argv._[0]);
 
         _.extend(this, opts);
