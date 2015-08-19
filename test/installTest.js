@@ -1,11 +1,12 @@
-var chaki = require('../chaki'),
-    path = require('path'),
+var path = require('path'),
     shell = require('shelljs'),
     rmdir = require('rimraf'),
     _ = require('underscore'),
     fs = require('fs'),
     testModulePath = __dirname + '/testApp/sencha-workspace/SlateAdmin/',
-    testGithubAcct = "starsinmypockets";
+    testGithubAcct = "starsinmypockets",
+    chaki,
+    x=0;
 
 // report uncaught exceptions please
 process.on('uncaughtException', function(err) {
@@ -115,6 +116,7 @@ var mockApi = {
 
 var testChakiRuns = function (test) {
     console.error("TEST 1");
+    test.expect(1);
     chaki.init({
         command : 'test',
         args : {}
@@ -123,31 +125,42 @@ var testChakiRuns = function (test) {
     test.done();
 };
 
+testChakiCurDir = function (test) {
+    chaki.init({
+        command : 'test',
+        args : {}
+    });
+    console.log("CURDIR", __dirname);
+    test.ok(haki.curPath == path.resolve(__dirname, '..'));
+    test.done();
+};
+
+
 var testGetAppJsonPath = function (test) {
-    console.error("TEST 2");
-    var jsonPath = chaki._getAppJsonPath();
-    test.ok(jsonPath === path.resolve(__dirname, '..', 'app.json'), "_getAppJsonPath should be the same as the chaki path");
-    test.ok(chaki._getAppJsonPath('ext/123') === path.resolve(__dirname, '..', 'ext', '123'));
+    chaki.init({
+        command : 'test',
+        args : {}
+    });
+    var jsonPath = chaki.getAppJsonPath();
+    console.error("TEST 2", jsonPath, chaki.args);
+    test.ok(path.resolve(jsonPath) === path.resolve(__dirname, '..', 'app.json'), "_getAppJsonPath should be the same as the chaki run if args.app not set");
+  
     test.done();
 };
 
 var testGetBuildXMLPath = function (test) {
   var appPath = path.resolve(__dirname, '..');
   var p1 = chaki._getBuildXMLPath();
-  var p2 = chaki._getBuildXMLPath("packageName");
 
   // check from specified app dir
   chaki.args.app = "path/to/app";
 
   var p3 = chaki._getBuildXMLPath();
-  var p4  = chaki._getBuildXMLPath("packageName");
+  console.log(p1, p3);
 
   test.ok(p1 === appPath + '/build.xml');
-  test.ok(p2 === appPath + '/packageName/build.xml');
   test.ok(p3 === appPath + '/path/to/app/build.xml');
-  test.ok(p4 === appPath + '/packageName/build.xml');
 
-  console.log('TEST 3', path.resolve(__dirname, '..'), '1', p1, '2', p2, '3', p3, '4', p4);
   test.done();
 };
 
@@ -207,22 +220,6 @@ var testInstall = function (test) {
   });
 };
 
-/**
- * Run the instaler against the slate-sencha app
- */
-testInstall2 = function (test) {
-    var installDir = __dirname + '/testApp2',
-        repo = "git@github.com:SlateFoundation/slate-admin.git";
-
-    rmdir(installDir, function () {
-      var result = shell.exec('git clone ' + repo + ' ' + installDir);
-      test.ok(result.code === 0);
-      test.done();
-    });
-};
-
-module.exports.testInstall2 = testInstall2;
-
 var testGetPackageInstallPath = function (test) {
   var testWritten = false;
   test.ok(testWritten === true, "Write testGetPackageInstallPath");
@@ -274,15 +271,17 @@ module.exports.testCacheProps = testCacheProps;
     
 tesGitClone = function (test) {
     var Git = require(__dirname + '/../lib/git');
-    ;
+
     // test good
     var data = {
       path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
       dest : __dirname + '/testGitRepo'
     };
 
-    rmdir(data.dest, function () {
-      var code = Git._gitCloneRepo(data);
+    console.log(">>>", data);
+    rmdir(data.dest, function (err) {
+      if (err) console.log("...err",err);
+      var code = Git.gitCloneRepo(data);
       test.ok(code === 0);
       test.ok(fs.existsSync(data.dest));
       test.ok(fs.existsSync(data.dest+'/README.md'));
@@ -293,13 +292,12 @@ tesGitClone = function (test) {
       //   dest : __dirname + '/test/noExists'
       // };
 
-      // var bad = Install._gitCloneRepo(badData);
+      // var bad = Install.gitCloneRepo(badData);
       // test.ok(code !== 0);
       // test.ok(!fs.existsSync(badData.dest));
 
       test.done();      
-    });
-
+    });      
 };
 
 testGitGetBranches = function (test) {
@@ -311,10 +309,10 @@ testGitGetBranches = function (test) {
       dest : __dirname + '/testGitRepo'
     };
 
-    Git._gitCloneRepo(data);
+    Git.gitCloneRepo(data);
     var out = Git._gitGetAllBranches(data);
     test.ok(out.indexOf('master') >= 0);
-    test.ok(out.indexOf('origin/test1') >= 0);
+    test.ok(out.indexOf('ext/5.1.1') >= 0);
     console.log("TGGA 1", out);
     test.done();
 };
@@ -330,12 +328,10 @@ testGitCheckout = function (test) {
     };
 
     rmdir(data.dest, function () {
-      Git._gitCloneRepo(data);
-      var result = Git._gitCheckoutBranch({path : data.dest, branch : 'test2'});
-
-      _.each(result, function (r) {
-        test.ok(r.code === 0, r + 'status ok');
-      });
+      Git.gitCloneRepo(data);
+      var result = Git.gitCheckoutBranch({path : data.dest, branch : 'test2'});
+      console.log("AA",result);
+      test.ok(result.code === 0, 'status ok');
       test.ok(fs.existsSync(data.dest + '/test2'), data.dest + '/test2 exists');
       test.ok(!fs.existsSync(data.dest + '/test21'), data.dest + '/test21 NO EXIST');
       test.ok(!fs.existsSync(data.dest + '/test1'), data.dest + '/test1 not present');
@@ -358,28 +354,41 @@ testGetBestBranch = function (test) {
   data.dest = __dirname + '/testGitRepo';
   data.senchaInfo = chaki.getSenchaInfo();
 
-  var result = Git._getBestBranch(data);
+  var result = Git.getBestBranch(data);
   console.log("fbb 1", result);
   test.done();
 };
 
+module.exports.setUp = function (cb) {
+  chaki = require('../chaki');
+  x++;
+  console.log("SETUP", chaki.args);
+  cb();
+};
+
+module.exports.tearDown = function (cb) {
+    chaki = {};
+  console.log("TEARDOWN", chaki);
+    cb();
+};
 /*
  * Chaki unit tests
  */
 // module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
 // module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+// module.exports.testChakiCurDir = testChakiCurDir;
 // module.exports.testGetBuildXML = testGetBuildXML;
 // module.exports.testGitGetBranches = testGitGetBranches;
 // module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
 
 // /**
 //  * Git Stuff 
-//  */
-//  module.exports.tesGitClone = tesGitClone;
-//  module.exports.testGitCheckout = testGitCheckout;
-//  module.exports.testGitGetBranches = testGitGetBranches;
-//  module.exports.testGetBestBranch = testGetBestBranch;
+// //  */
+ // module.exports.tesGitClone = tesGitClone;
+ // module.exports.testGitCheckout = testGitCheckout;
+ // module.exports.testGitGetBranches = testGitGetBranches;
+ // module.exports.testGetBestBranch = testGetBestBranch;
 
 // /*
 //  * Installer

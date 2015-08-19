@@ -76,7 +76,7 @@ var chakiApp = chakiApp || {
     },
 
     getSenchaInfo : function () {
-        var data = this._loadCmdProperties(null, ['app.framework.version', "app.framework"]);
+        var data = this._loadCmdProperties(['app.framework.version', "app.framework"]);
         return data;
     },
     
