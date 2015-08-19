@@ -60,14 +60,13 @@ var chakiApp = chakiApp || {
     _getBuildXMLPath : function (componentPath) {
         console.error("[chaki] _getBuildXMLPath", componentPath, this.args.app);
         var outPath;
-        // if nothing is passed, use working directory
+        
         if (!componentPath) {
-            console.log('>>', this.args.app);
             outPath = (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
-        } else { // otherwise, we're in a package directory looking for dependencies
+        } else { 
             outPath = path.resolve(componentPath) + '/build.xml';
         }
-        console.error("_getBuildXMLPath", outPath);
+        
         return outPath;
     },
 
@@ -128,8 +127,16 @@ var chakiApp = chakiApp || {
     // @@TODO cache this stuff in memory
     _loadCmdProperties : function (componentPath, props) {
         console.error('Loading Sencha CMD configuration...');
-        var  buildXMLPath = this._getBuildXMLPath(componentPath);
+        var buildXMLPath = this._getBuildXMLPath(componentPath),
+            that = this;
 
+        // check first for locally stored values
+        if (this.cmdProperties) {
+            console.log('[chaki] Serving stored values');
+            return this.cmdProperties;
+        }
+
+        // or recompute....
         if (!fs.existsSync(buildXMLPath)) {
             console.error('Unable to find build.xml at ' + buildXMLPath);
             shell.exit(1);
@@ -162,6 +169,8 @@ var chakiApp = chakiApp || {
                 return _.pick(properties, props);
             }
 
+            // save values to app object
+            this.cmdProperties = properties;
             return properties;
         } catch (e) {
             console.error("Error loading Sencha Cmd", e);

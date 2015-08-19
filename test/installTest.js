@@ -165,9 +165,11 @@ var testGetBuildXML = function (test) {
     test.done();
 };
 
-
+/**
+ * This does a test install with a fake project 
+ * with a fairly complex dependency structure
+ **/
 var testInstall = function (test) {
-  console.error("TEST 5");
   var pkgDir = 'testApp/sencha-workspace/packages/';
   var pkgPath = path.resolve(__dirname, pkgDir);
 
@@ -205,6 +207,22 @@ var testInstall = function (test) {
   });
 };
 
+/**
+ * Run the instaler against the slate-sencha app
+ */
+testInstall2 = function (test) {
+    var installDir = __dirname + '/testApp2',
+        repo = "git@github.com:SlateFoundation/slate-admin.git";
+
+    rmdir(installDir, function () {
+      var result = shell.exec('git clone ' + repo + ' ' + installDir);
+      test.ok(result.code === 0);
+      test.done();
+    });
+};
+
+module.exports.testInstall2 = testInstall2;
+
 var testGetPackageInstallPath = function (test) {
   var testWritten = false;
   test.ok(testWritten === true, "Write testGetPackageInstallPath");
@@ -228,9 +246,35 @@ var testGetSenchaVersion = function (test) {
   test.done();
 };
 
+
+testCacheProps = function (test) {
+    chaki.init({
+      command : "test",
+      args : {
+        app : testModulePath
+      }
+    });
+
+    var a = process.hrtime()[1];
+    chaki._loadCmdProperties();
+    var b = process.hrtime()[1];
+    var elapse1 = b - a;
+
+    var a1 = process.hrtime()[1];
+    chaki._loadCmdProperties();
+    var b1 = process.hrtime()[1];
+    var elapse2 = b1 - a1;
+
+    test.ok(elapse2 * 10 < elapse1, "Getting chached properties is way faster");
+    test.ok(typeof chaki.cmdProperties === 'object', "Command properties stored as object");
+    test.done();
+};
+
+module.exports.testCacheProps = testCacheProps;
+    
 tesGitClone = function (test) {
     var Git = require(__dirname + '/../lib/git');
-    
+    ;
     // test good
     var data = {
       path : 'https://github.com/' + testGithubAcct + '/chaki-test-module-A',
@@ -322,22 +366,22 @@ testGetBestBranch = function (test) {
 /*
  * Chaki unit tests
  */
-module.exports.testChakiRuns = testChakiRuns;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
-module.exports.testGetBuildXML = testGetBuildXML;
-module.exports.testGitGetBranches = testGitGetBranches;
-module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testChakiRuns = testChakiRuns;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
+// module.exports.testGetBuildXML = testGetBuildXML;
+// module.exports.testGitGetBranches = testGitGetBranches;
+// module.exports.testGetSenchaVersion = testGetSenchaVersion;
 
-/**
- * Git Stuff 
- */
- module.exports.tesGitClone = tesGitClone;
- module.exports.testGitCheckout = testGitCheckout;
- module.exports.testGitGetBranches = testGitGetBranches;
- module.exports.testGetBestBranch = testGetBestBranch;
+// /**
+//  * Git Stuff 
+//  */
+//  module.exports.tesGitClone = tesGitClone;
+//  module.exports.testGitCheckout = testGitCheckout;
+//  module.exports.testGitGetBranches = testGitGetBranches;
+//  module.exports.testGetBestBranch = testGetBestBranch;
 
-/*
- * Installer
- */
-module.exports.testInstall = testInstall;
+// /*
+//  * Installer
+//  */
+ module.exports.testInstall = testInstall;
