@@ -1,5 +1,6 @@
 # chaki
 
+#### Description
 Install project dependencies from Chaki repository "http://chaki.io/packages/"
 
 #### Usage
