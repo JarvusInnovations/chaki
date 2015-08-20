@@ -7,6 +7,7 @@
     "url": "https://github.com/JarvusInnovations/chaki"
   },
   "dependencies": {
+    "flatiron": "^0.4.3",
     "minimist": "*",
     "nodegit": "^0.4.1",
     "restler": "*",
