@@ -86,9 +86,7 @@ app.getUserAgent = function () {
     var ver = app.getNpmData('version').version;
     var sen = app.getSenchaInfo();
     var hash = sha1(sen['app.framework.version']);
-    console.log(ver, sen);
     var ua = "Chaki/"+ver+" ("+ sen['app.framework']+'/'+sen['app.framework.version']+'); app/'+hash;
-    console.log(ua);
     return(ua);
 };
 

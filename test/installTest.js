@@ -117,7 +117,7 @@ var mockApi = {
 var testChakiRuns = function (test) {
     console.error("TEST 1");
     test.expect(1);
-    chaki.init({
+    chaki.extend({
         command : 'test',
         args : {}
     });
@@ -126,7 +126,7 @@ var testChakiRuns = function (test) {
 };
 
 testChakiCurDir = function (test) {
-    chaki.init({
+    chaki.extend({
         command : 'test',
         args : {}
     });
@@ -137,7 +137,7 @@ testChakiCurDir = function (test) {
 
 
 var testGetAppJsonPath = function (test) {
-    chaki.init({
+    chaki.extend({
         command : 'test',
         args : {}
     });
@@ -180,7 +180,7 @@ var testInstall = function (test) {
     Install.installPackages({app: chaki, method : 'test'});
 
       // console.log("111");
-      // chaki.init({
+      // chaki.extend({
       //     command : "install",
       //     method : "test",
       //     mockApi : mockApi,
@@ -208,7 +208,7 @@ var testGetPackageInstallPath = function (test) {
 var testGetSenchaVersion = function (test) {
   var senchaData;
 
-  chaki.init({
+  chaki.extend({
     command : "test",
     args : {
       app : testModulePath
@@ -223,7 +223,7 @@ var testGetSenchaVersion = function (test) {
 };
 
 testGetAppProps = function (test) {
-    chaki.init({
+    chaki.extend({
       command : "test",
       args : {
         app : testModulePath
@@ -239,7 +239,7 @@ testGetAppProps = function (test) {
 };
 
 testGetCmdProps = function (test) {
-    chaki.init({
+    chaki.extend({
       command : "test",
       args : {
         app : testModulePath
@@ -254,7 +254,7 @@ testGetCmdProps = function (test) {
 };
 
 testCacheProps = function (test) {
-    chaki.init({
+    chaki.extend({
       command : "test",
       args : {
         app : testModulePath
@@ -369,7 +369,7 @@ testGetBestBranch = function (test) {
   var Git = require(__dirname + '/../lib/git');
   var data = {};
 
-  chaki.init({
+  chaki.extend({
     command : "test",
     args : {
       app : testModulePath
@@ -409,24 +409,24 @@ module.exports.tearDown = function (cb) {
  * Chaki unit tests
  */
 module.exports.testGetNpmData = testGetNpmData;
-// module.exports.testCacheProps = testCacheProps;
-// module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testChakiCurDir = testChakiCurDir;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetSenchaVersion = testGetSenchaVersion;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
-// module.exports.testCmdAppProps = testGetCmdProps;
-// module.exports.testGetAppProps = testGetAppProps;
+module.exports.testCacheProps = testCacheProps;
+module.exports.testChakiRuns = testChakiRuns;
+module.exports.testChakiCurDir = testChakiCurDir;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetSenchaVersion = testGetSenchaVersion;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testCmdAppProps = testGetCmdProps;
+module.exports.testGetAppProps = testGetAppProps;
 
 /**
  * Git Stuff 
  */
-// module.exports.tesGitClone = tesGitClone;
-// module.exports.testGitCheckout = testGitCheckout;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetBestBranch = testGetBestBranch;
+module.exports.tesGitClone = tesGitClone;
+module.exports.testGitCheckout = testGitCheckout;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
  */
-// module.exports.testInstall = testInstall;
+module.exports.testInstall = testInstall;
