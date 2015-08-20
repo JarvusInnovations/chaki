@@ -31,6 +31,10 @@ app.cmd('hello', function () {
  **/
 app.cmd('install', function () {
     app.log.info('Install...');
+    var cmdProperties = _loadCmdProperties();
+    var Install = require(__dirname + '/lib/install');
+    app.workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+    Install.installPackages({app: app, method : 'api'});
 });
 
 app.cmd('install :package', function (package) {
@@ -74,7 +78,11 @@ app.getCmdProps = function (props) {
 app.getAppProps = function (props) {
     console.log(props);
     var path = app.getAppJsonPath();
-    return app._loadAppProperties(path, props);
+    return _loadAppProperties(path, props);
+};
+
+app.getModuleProps = function (path, props) {
+    return _loadAppProperties(path, props);
 };
 
 // /**
