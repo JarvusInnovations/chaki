@@ -149,9 +149,6 @@ var testGetAppJsonPath = function (test) {
     test.done();
 };
 
-
-
-var test
 /**
  * This does a test install with a fake project 
  * with a fairly complex dependency structure
@@ -174,15 +171,21 @@ var testInstall = function (test) {
 
       // put it back
       fs.mkdirSync(pkgPath);
-      console.log("111");
-      chaki.init({
-          command : "install",
-          method : "test",
-          mockApi : mockApi,
-          args : {
-              app : '/var/dev/chaki/test/testApp/sencha-workspace/SlateAdmin'
-          }
-      });
+
+    chaki.args.app = testModulePath;
+    var cmdProperties = chaki.getCmdProps();
+    var Install = require(__dirname + '/../lib/install');
+    Install.installPackages({app: chaki, method : 'api'});
+
+      // console.log("111");
+      // chaki.init({
+      //     command : "install",
+      //     method : "test",
+      //     mockApi : mockApi,
+      //     args : {
+      //         app : '/var/dev/chaki/test/testApp/sencha-workspace/SlateAdmin'
+      //     }
+      // });
       test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A'), pkgPath +"/dep exist 1");
       test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-1'), pkgPath +"/dep exist 2");
       test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-2'), pkgPath +"/dep exist 3");
@@ -395,15 +398,15 @@ module.exports.testGetAppJsonPath = testGetAppJsonPath;
 module.exports.testCmdAppProps = testGetCmdProps;
 module.exports.testGetAppProps = testGetAppProps;
 
-// /**
-//  * Git Stuff 
-// //  */
- // module.exports.tesGitClone = tesGitClone;
- // module.exports.testGitCheckout = testGitCheckout;
- // module.exports.testGitGetBranches = testGitGetBranches;
- // module.exports.testGetBestBranch = testGetBestBranch;
+/**
+ * Git Stuff 
+ */
+module.exports.tesGitClone = tesGitClone;
+module.exports.testGitCheckout = testGitCheckout;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetBestBranch = testGetBestBranch;
 
-// /*
-//  * Installer
-//  */
+/*
+ * Installer
+ */
 // module.exports.testInstall = testInstall;
