@@ -175,6 +175,7 @@ var testInstall = function (test) {
     chaki.args.app = testModulePath;
     chaki.mockApi = mockApi;
     var cmdProperties = chaki.getCmdProps();
+    chaki.workspacePackagesPath = cmdProperties['workspace.packages.dir'];
     var Install = require(__dirname + '/../lib/install');
     Install.installPackages({app: chaki, method : 'test'});
 
