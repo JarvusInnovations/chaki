@@ -4,6 +4,7 @@
 var flatiron = require('flatiron'),
     app = flatiron.app,
     path = require('path'),
+    prettyjson = require('prettyjson').render;
     Install = require(__dirname + '/lib/install');
 
 app.use(flatiron.plugins.cli, {
@@ -38,7 +39,7 @@ app.cmd('install :package', function (package) {
 
 app.cmd('dump-cmd-props', function () {
     var path = app.getAppJsonPath();
-    console.log(_loadAppProperties(path));
+    console.log(prettyjson(_loadAppProperties(path)));
 });
 
 app.cmd('dump-app-props', function () {
