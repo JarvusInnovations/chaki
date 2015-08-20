@@ -413,8 +413,9 @@ testGetBestBranch = function (test) {
  * SETUP
  */
 module.exports.setUp = function (cb) {
-  shell.cd(path.resolve(__dirname, '..'));
-  chaki = require('../chaki');
+ shell.cd(path.resolve(__dirname, '..'));
+ console.log(process.cwd());
+  chaki = require(process.cwd() + '/chaki');
   chaki.args = {};
   x++;
   console.log("TEST " + x, chaki.args);
@@ -431,7 +432,7 @@ module.exports.tearDown = function (cb) {
 /*
  * Chaki unit tests
  */
-module.exports.testCacheProps = testCacheProps;
+//module.exports.testCacheProps = testCacheProps;
 module.exports.testChakiRuns = testChakiRuns;
 module.exports.testGetBuildXMLPath = testGetBuildXMLPath;
 module.exports.testChakiCurDir = testChakiCurDir;

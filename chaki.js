@@ -5,7 +5,8 @@ var flatiron = require('flatiron'),
     app = flatiron.app,
     path = require('path'),
     prettyjson = require('prettyjson').render;
-    Install = require(__dirname + '/lib/install');
+    Install = require(__dirname + '/lib/install'),
+    _ = require('underscore');
 
 app.use(flatiron.plugins.cli, {
   dir: __dirname,
@@ -25,6 +26,10 @@ app.cmd('hello', function () {
     app.log.info('hello '+result.name+'!');
   });
 });
+
+app.init = function (opts) {
+    _.extend(app, opts);
+};
 
 /**
  * Commands
@@ -195,3 +200,4 @@ _camelCased = function (str) {
 };
 
 app.start();
+module.exports = app;
