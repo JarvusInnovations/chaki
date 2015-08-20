@@ -189,12 +189,12 @@ var testInstall = function (test) {
       //     }
       // });
       test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A'), pkgPath +"/dep exist 1");
-      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-1'), pkgPath +"/dep exist 2");
-      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A/packages/chaki-test-module-A-2'), pkgPath +"/dep exist 3");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A-1'), pkgPath +"/dep exist 2");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-A-2'), pkgPath +"/dep exist 3");
       test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B'), pkgPath +"/dep exist 4");
-      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1'), pkgPath +"/dep exist 5");
-      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-a'), pkgPath +"/dep exist 6");
-      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B/packages/chaki-test-module-B-1/packages/chaki-test-module-B-1-b'), pkgPath +"/dep exist 7");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B-1'), pkgPath +"/dep exist 5");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B-1-a'), pkgPath +"/dep exist 6");
+      test.ok(fs.existsSync(pkgPath + '/chaki-test-module-B-1-b'), pkgPath +"/dep exist 7");
       test.done();
   });
 };
@@ -391,22 +391,22 @@ module.exports.tearDown = function (cb) {
 /*
  * Chaki unit tests
  */
-// module.exports.testCacheProps = testCacheProps;
-// module.exports.testChakiRuns = testChakiRuns;
-// module.exports.testChakiCurDir = testChakiCurDir;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetSenchaVersion = testGetSenchaVersion;
-// module.exports.testGetAppJsonPath = testGetAppJsonPath;
-// module.exports.testCmdAppProps = testGetCmdProps;
-// module.exports.testGetAppProps = testGetAppProps;
+module.exports.testCacheProps = testCacheProps;
+module.exports.testChakiRuns = testChakiRuns;
+module.exports.testChakiCurDir = testChakiCurDir;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetSenchaVersion = testGetSenchaVersion;
+module.exports.testGetAppJsonPath = testGetAppJsonPath;
+module.exports.testCmdAppProps = testGetCmdProps;
+module.exports.testGetAppProps = testGetAppProps;
 
 /**
  * Git Stuff 
  */
-// module.exports.tesGitClone = tesGitClone;
-// module.exports.testGitCheckout = testGitCheckout;
-// module.exports.testGitGetBranches = testGitGetBranches;
-// module.exports.testGetBestBranch = testGetBestBranch;
+module.exports.tesGitClone = tesGitClone;
+module.exports.testGitCheckout = testGitCheckout;
+module.exports.testGitGetBranches = testGitGetBranches;
+module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
