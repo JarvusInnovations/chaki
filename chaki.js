@@ -1,75 +1,83 @@
 /**
  * Chaki!
  **/
-
 var flatiron = require('flatiron'),
+    app = flatiron.app,
     path = require('path'),
-    cli = flatiron.app,
     Install = require(__dirname + '/lib/install');
 
-
-cli.use(flatiron.plugins.cli, {
+app.use(flatiron.plugins.cli, {
   dir: __dirname,
   usage: [
-    'Chaki install [packagename]'
+    'This is a basic flatiron cli application example!',
+    '',
+    'hello - say hello to somebody.'
   ]
 });
 
-cli.cmd('hello', function () {
-  cli.prompt.get('name', function (err, result) {
-    cli.log.info('hello '+result.name+'!');
+app.args = app.argv;
+app.cwd = path.resolve(process.cwd());
+
+
+app.cmd('hello', function () {
+  app.prompt.get('name', function (err, result) {
+    app.log.info('hello '+result.name+'!');
   });
 });
 
-cli.cmd('install', function () {
-    cli.log.info('Install...');
-});
-
-cli.cmd('install :hey', function (package) {
-    cli.log.info('Installing ' + package + ' ...');
-});
-
-cli.cmd('dump-cmd-props', function () {
-
-});
-
-cli.cmd('dump-app-props', function () {
-
-});
-
 /**
- * GETTERS
+ * Commands
  **/
-getAppJsonPath = function (packagePath) {
+app.cmd('install', function () {
+    app.log.info('Install...');
+});
+
+app.cmd('install :package', function (package) {
+    app.log.info('Installing ' + package + ' ...');
+});
+
+app.cmd('dump-cmd-props', function () {
+    var path = app.getAppJsonPath();
+    console.log(_loadAppProperties(path));
+});
+
+app.cmd('dump-app-props', function () {
+
+});
+
+// /**
+//  * GETTERS
+//  **/
+app.getAppJsonPath = function (packagePath) {
     var path;
     if (packagePath) {
         path = packagePath + '/package.json';
     } else {
-        path = (this.args.app)  ? this.args.app + '/app.json' : this.curPath + '/app.json';
+        path = (app.args.app)  ? app.args.app + '/app.json' : app.cwd + '/app.json';
     }
 
     console.log("[chaki] getAppJson", path);
     return path;
 };
 
-getSenchaInfo = function () {
-    var data = this._loadCmdProperties(['app.framework.version', "app.framework"]);
-    return data;
-};
+// app.getSenchaInfo = function () {
+//     var data = this._loadCmdProperties(['app.framework.version', "app.framework"]);
+//     return data;
+// };
 
-getCmdProps = function (props) {
-    return this._loadCmdProperties(props);
-};
+// app.getCmdProps = function (props) {
+//     return this._loadCmdProperties(props);
+// };
 
-getAppProps = function (props) {
-    console.log(props);
-    var path = this.getAppJsonPath();
-    return this._loadAppProperties(path, props);
-};
+// app.getAppProps = function (props) {
+//     console.log(props);
+//     var path = this.getAppJsonPath();
+//     return this._loadAppProperties(path, props);
+// };
 
-/**
- * PRIVATES
- **/
+// /**
+//  * PRIVATES
+//  **/
 _getBuildXMLPath = function () {
     return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
 };
@@ -101,7 +109,7 @@ _loadAppProperties = function (appJsonPath, props) {
     return jsonObject;
 };
 
-_loadCmdProperties = function (props) {
+app._loadCmdProperties = function (props) {
     console.error('Loading Sencha CMD configuration...');
     var buildXMLPath = this._getBuildXMLPath(),
         that = this;
@@ -153,7 +161,7 @@ _loadCmdProperties = function (props) {
     }
 };
 
-_getWorkspacePackagesPath = function (cmdProperties) {
+app._getWorkspacePackagesPath = function (cmdProperties) {
     var path = cmdProperties['workspace.packages.dir'];
     console.error("_workspacePath", path);
     if (!path) {
@@ -171,10 +179,10 @@ _getWorkspacePackagesPath = function (cmdProperties) {
 /**
  * Util
  **/
-_camelCased = function (str) {
+app._camelCased = function (str) {
     if (str) {
         return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
     }
 };
 
-cli.start();
+app.start();
