@@ -19,7 +19,15 @@ app.use(flatiron.plugins.cli, {
 
 app.args = app.argv;
 app.cwd = path.resolve(process.cwd());
+app.registryUrl = 'htpps://chaki.io/packages/';
 
+app.extend = function (opts) {
+    _.extend(app, opts);
+};
+
+/**
+ * Commands
+ **/
 
 app.cmd('hello', function () {
   app.prompt.get('name', function (err, result) {
@@ -27,13 +35,6 @@ app.cmd('hello', function () {
   });
 });
 
-app.init = function (opts) {
-    _.extend(app, opts);
-};
-
-/**
- * Commands
- **/
 app.cmd('install', function () {
     app.log.info('Install...');
     var cmdProperties = _loadCmdProperties();
@@ -69,6 +70,26 @@ app.getAppJsonPath = function (packagePath) {
 
     console.log("[chaki] getAppJson", path);
     return path;
+};
+
+app.getNpmData = function (props) {
+    var data = require(path.resolve(__dirname, 'package.json'));
+    
+    if (props) {
+        return _.pick(data, props);
+    }
+
+    return data;
+};
+
+app.getUserAgent = function () {
+    var ver = app.getNpmData('version').version;
+    var sen = app.getSenchaInfo();
+    var hash = sha1(sen['app.framework.version']);
+    console.log(ver, sen);
+    var ua = "Chaki/"+ver+" ("+ sen['app.framework']+'/'+sen['app.framework.version']+'); app/'+hash;
+    console.log(ua);
+    return(ua);
 };
 
 app.getSenchaInfo = function () {
@@ -199,5 +220,10 @@ _camelCased = function (str) {
     }
 };
 
-app.start();
+sha1 = function (input) {
+    var crypto = require('crypto');
+    return crypto.createHash('sha1').update(JSON.stringify(input)).digest('hex')
+};
+
 module.exports = app;
+app.start();

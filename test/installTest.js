@@ -276,7 +276,24 @@ testCacheProps = function (test) {
     test.done();
 };
 
+testGetNpmData = function (test) {
+    var data = chaki.getNpmData();
+    console.log(data);
+    test.ok(typeof data === 'object');
     
+    var data1 = chaki.getNpmData('version').version;
+    test.ok(data1.split('.').length === 3);
+    test.done();
+};
+
+testGetUA = function (test) {
+  chaki.args.app = testModulePath;
+  var UA = chaki.getUserAgent();
+  test.done();
+};
+
+module.exports.testGetUA = testGetUA;
+
 tesGitClone = function (test) {
     var Git = require(__dirname + '/../lib/git');
 
@@ -384,31 +401,32 @@ module.exports.setUp = function (cb) {
 module.exports.tearDown = function (cb) {
   chaki = {};
   console.log("TEARDOWN", chaki);
-    cb();
+  cb();
 };
 
 
 /*
  * Chaki unit tests
  */
-module.exports.testCacheProps = testCacheProps;
-module.exports.testChakiRuns = testChakiRuns;
-module.exports.testChakiCurDir = testChakiCurDir;
-module.exports.testGitGetBranches = testGitGetBranches;
-module.exports.testGetSenchaVersion = testGetSenchaVersion;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testCmdAppProps = testGetCmdProps;
-module.exports.testGetAppProps = testGetAppProps;
+module.exports.testGetNpmData = testGetNpmData;
+// module.exports.testCacheProps = testCacheProps;
+// module.exports.testChakiRuns = testChakiRuns;
+// module.exports.testChakiCurDir = testChakiCurDir;
+// module.exports.testGitGetBranches = testGitGetBranches;
+// module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testCmdAppProps = testGetCmdProps;
+// module.exports.testGetAppProps = testGetAppProps;
 
 /**
  * Git Stuff 
  */
-module.exports.tesGitClone = tesGitClone;
-module.exports.testGitCheckout = testGitCheckout;
-module.exports.testGitGetBranches = testGitGetBranches;
-module.exports.testGetBestBranch = testGetBestBranch;
+// module.exports.tesGitClone = tesGitClone;
+// module.exports.testGitCheckout = testGitCheckout;
+// module.exports.testGitGetBranches = testGitGetBranches;
+// module.exports.testGetBestBranch = testGetBestBranch;
 
 /*
  * Installer
  */
- module.exports.testInstall = testInstall;
+// module.exports.testInstall = testInstall;
