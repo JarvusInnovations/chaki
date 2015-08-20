@@ -72,12 +72,12 @@ app.getAppJsonPath = function (packagePath) {
 };
 
 app.getSenchaInfo = function () {
-    var data = app._loadCmdProperties(['app.framework.version', "app.framework"]);
+    var data = app.getCmdProps(['app.framework.version', "app.framework"]);
     return data;
 };
 
 app.getCmdProps = function (props) {
-    return app._loadCmdProperties(props);
+    return _loadCmdProperties(props);
 };
 
 app.getAppProps = function (props) {
