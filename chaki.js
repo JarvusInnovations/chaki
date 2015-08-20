@@ -10,7 +10,7 @@ var flatiron = require('flatiron'),
 app.use(flatiron.plugins.cli, {
   dir: __dirname,
   usage: [
-    'This is a basic flatiron cli application example!',
+    'app is a basic flatiron cli application example!',
     '',
     'hello - say hello to somebody.'
   ]
@@ -39,11 +39,12 @@ app.cmd('install :package', function (package) {
 
 app.cmd('dump-cmd-props', function () {
     var path = app.getAppJsonPath();
-    console.log(prettyjson(_loadAppProperties(path)));
+    app.log.info(prettyjson(_loadCmdProperties()));
 });
 
 app.cmd('dump-app-props', function () {
-
+    var path = app.getAppJsonPath();
+    app.log.info(prettyjson(_loadAppProperties(path)));
 });
 
 // /**
@@ -61,26 +62,26 @@ app.getAppJsonPath = function (packagePath) {
     return path;
 };
 
-// app.getSenchaInfo = function () {
-//     var data = this._loadCmdProperties(['app.framework.version', "app.framework"]);
-//     return data;
-// };
+app.getSenchaInfo = function () {
+    var data = app._loadCmdProperties(['app.framework.version', "app.framework"]);
+    return data;
+};
 
-// app.getCmdProps = function (props) {
-//     return this._loadCmdProperties(props);
-// };
+app.getCmdProps = function (props) {
+    return app._loadCmdProperties(props);
+};
 
-// app.getAppProps = function (props) {
-//     console.log(props);
-//     var path = this.getAppJsonPath();
-//     return this._loadAppProperties(path, props);
-// };
+app.getAppProps = function (props) {
+    console.log(props);
+    var path = app.getAppJsonPath();
+    return app._loadAppProperties(path, props);
+};
 
 // /**
 //  * PRIVATES
 //  **/
 _getBuildXMLPath = function () {
-    return (this.args.app) ? path.resolve(__dirname, this.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
+    return (app.args.app) ? path.resolve(__dirname, app.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
 };
 
 _loadAppProperties = function (appJsonPath, props) {
@@ -110,14 +111,14 @@ _loadAppProperties = function (appJsonPath, props) {
     return jsonObject;
 };
 
-app._loadCmdProperties = function (props) {
+_loadCmdProperties = function (props) {
     console.error('Loading Sencha CMD configuration...');
-    var buildXMLPath = this._getBuildXMLPath(),
-        that = this;
+    var buildXMLPath = _getBuildXMLPath(),
+        that = app;
 
     // check first for locally stored values
-    if (this.cmdProperties) {
-        return (props) ? _.pick(this.cmdProperties, props) : this.cmdProperties;
+    if (app.cmdProperties) {
+        return (props) ? _.pick(app.cmdProperties, props) : app.cmdProperties;
     }
 
     // or recompute....
@@ -131,8 +132,8 @@ app._loadCmdProperties = function (props) {
         shell.exit(1);
     }
 
-    if (this.args.app) {
-        shell.cd(this.args.app);
+    if (app.args.app) {
+        shell.cd(app.args.app);
     }
 
 
@@ -148,13 +149,12 @@ app._loadCmdProperties = function (props) {
         }
 
         console.error('Loaded ' + Object.keys(properties).length + ' properties.');
-        
         if (props) {
             return _.pick(properties, props);
         }
 
         // save values to app object
-        this.cmdProperties = properties;
+        app.cmdProperties = properties;
         return properties;
     } catch (e) {
         console.error("Error loading Sencha Cmd", e);
@@ -162,7 +162,7 @@ app._loadCmdProperties = function (props) {
     }
 };
 
-app._getWorkspacePackagesPath = function (cmdProperties) {
+_getWorkspacePackagesPath = function (cmdProperties) {
     var path = cmdProperties['workspace.packages.dir'];
     console.error("_workspacePath", path);
     if (!path) {
@@ -180,7 +180,7 @@ app._getWorkspacePackagesPath = function (cmdProperties) {
 /**
  * Util
  **/
-app._camelCased = function (str) {
+_camelCased = function (str) {
     if (str) {
         return  str.replace(/-([a-z])/g, function (g) { return g[1].toUpperCase(); });
     }
