@@ -6,7 +6,13 @@ var flatiron = require('flatiron'),
     path = require('path'),
     prettyjson = require('prettyjson').render;
     Install = require(__dirname + '/lib/install'),
-    _ = require('underscore');
+    xml2js = require('xml2js'),
+    _ = require('underscore'),
+    strip = require('strip-comments');
+
+console.json = function(json) {
+    app.log.info(prettyjson(JSON.stringify(json, 100)));
+};
 
 app.use(flatiron.plugins.cli, {
   dir: __dirname,
@@ -57,9 +63,13 @@ app.cmd('dump-app-props', function () {
     app.log.info(prettyjson(_loadAppProperties(path)));
 });
 
-// /**
-//  * GETTERS
-//  **/
+app.cmd('get-ua-string', function () {
+    app.log.info(app.getUserAgent());
+});
+
+/**
+ * GETTERS
+ **/
 app.getAppJsonPath = function (packagePath) {
     var path;
     if (packagePath) {
@@ -86,7 +96,7 @@ app.getUserAgent = function () {
     var ver = app.getNpmData('version').version;
     var sen = app.getSenchaInfo();
     var hash = sha1(sen['app.framework.version']);
-    var ua = "Chaki/"+ver+" ("+ sen['app.framework']+'/'+sen['app.framework.version']+'); app/'+hash;
+    var ua = "Chaki/"+ver+" ("+ sen['app.framework']+'/'+sen['app.framework.version']+'; app/'+hash+')';
     return(ua);
 };
 
@@ -109,9 +119,80 @@ app.getModuleProps = function (path, props) {
     return _loadAppProperties(path, props);
 };
 
-// /**
-//  * PRIVATES
-//  **/
+// get requires array from app.json
+app.getAppJsonRequires = function (appJson) {
+    var regex = /"requires"\s*:\s*\[([^\]\*]+)\]/;
+    var match = (appJson.match(regex))[0];
+    console.log("getAppJsonRequires", match);
+    return match;
+},
+
+/**
+ * SETTERS
+ **/
+
+// here this one will give you an additional match set that gives you what you should prefix 
+// your addition with to indent consistently:
+// /"requires"\s*:\s*\[(\s*)([^\]\*]+)\]/
+// so glue `,$1”packgae-name”` to the end of $2
+
+// make sure there's 1 and only 1 match
+// append package name
+// replace
+// write
+app.updateAppJson = function (opts) {
+    var regex = /"requires"\s*:\s*\[([^\]\*]+)\]/;
+    var appJson = fs.readFileSync(app.getAppJsonPath(), 'utf8');
+    var match = app.getAppJsonRequires(appJson);
+    var update = match.substring(0, match.length - 2);
+    update += ', \"' + opts.packageName + '\"]';
+    appJson = appJson.replace(regex, update);
+
+    // make sure we're left with a valid json obj
+    if (app.checkUpdateAppJson(appJson)) {
+        fs.writeFileSync(app.getAppJsonPath(), appJson);
+        return true;
+    } else {
+        console.error("There was a problem updating the app.json configuration\
+            file. You might want to update it manually to reflect the module you\
+            just installed.");
+        return false;
+    }
+    console.log("UAJ1", opts, match, update, appJson);    
+};
+
+// ensure that when stripped of comments that
+// this is valid JSON
+app.checkUpdateAppJson = function (appJson) {
+    try {
+        JSON.stringify(strip(appJson)); 
+        return true;  
+    } catch (e) {
+        console.log("CATCH");
+        return false;
+    }
+};
+
+
+// <target name=“-before-build”>
+//     <exec executable=“chaki”>
+//         <arg value=“update” />
+//     </exec>
+// </target>
+
+//insert it before `</project>`
+
+app.addTargetHook = function () {
+    var parser = new xml2js.Parser();
+    var xml = fs.readFileSync(_getBuildXMLPath(), 'utf8');
+    var obj = xml2js.parseString(xml, function (err, result) {
+        console.json(result);
+    });
+};
+
+/**
+ * PRIVATES
+ **/
 _getBuildXMLPath = function () {
     return (app.args.app) ? path.resolve(__dirname, app.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
 };
@@ -220,7 +301,16 @@ _camelCased = function (str) {
 
 sha1 = function (input) {
     var crypto = require('crypto');
-    return crypto.createHash('sha1').update(JSON.stringify(input)).digest('hex')
+    return crypto.createHash('sha1').update(JSON.stringify(input)).digest('hex');
+};
+
+getPosition = function(str, m, i) {
+   return str.split(m, i).join(m).length;
+};
+
+// let's use words ;[]
+String.prototype.splice = function( idx, rem, s ) {
+    return (this.slice(0,idx) + s + this.slice(idx + Math.abs(rem)));
 };
 
 module.exports = app;

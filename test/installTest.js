@@ -292,8 +292,6 @@ testGetUA = function (test) {
   test.done();
 };
 
-module.exports.testGetUA = testGetUA;
-
 tesGitClone = function (test) {
     var Git = require(__dirname + '/../lib/git');
 
@@ -384,6 +382,30 @@ testGetBestBranch = function (test) {
   test.done();
 };
 
+testWriteAppJson = function (test) {
+  chaki.extend({
+    command : "test",
+    args : {
+      app : testModulePath
+    }
+  });
+
+    test.ok(chaki.updateAppJson({packageName : "test-package-name"}));
+
+    // use injection to invalidate json and test for fail
+   // test.ok(!chaki.updateAppJson({packageName : "test-package-name\",,"}));
+    test.done();
+};
+
+testAddTargetHook = function (test) {
+  chaki.extend({
+    args : {
+      app : testModulePath
+    }
+  });
+  chaki.addTargetHook();
+  test.done();
+};
 
 /**
  * SETUP
@@ -405,28 +427,32 @@ module.exports.tearDown = function (cb) {
 };
 
 
-/*
- * Chaki unit tests
- */
-module.exports.testGetNpmData = testGetNpmData;
-module.exports.testCacheProps = testCacheProps;
-module.exports.testChakiRuns = testChakiRuns;
-module.exports.testChakiCurDir = testChakiCurDir;
-module.exports.testGitGetBranches = testGitGetBranches;
-module.exports.testGetSenchaVersion = testGetSenchaVersion;
-module.exports.testGetAppJsonPath = testGetAppJsonPath;
-module.exports.testCmdAppProps = testGetCmdProps;
-module.exports.testGetAppProps = testGetAppProps;
+// /*
+//  * Chaki unit tests
+//  */
+// module.exports.testGetNpmData = testGetNpmData;
+// module.exports.testCacheProps = testCacheProps;
+// module.exports.testChakiRuns = testChakiRuns;
+// module.exports.testChakiCurDir = testChakiCurDir;
+// module.exports.testGitGetBranches = testGitGetBranches;
+// module.exports.testGetSenchaVersion = testGetSenchaVersion;
+// module.exports.testGetAppJsonPath = testGetAppJsonPath;
+// module.exports.testCmdAppProps = testGetCmdProps;
+// module.exports.testGetAppProps = testGetAppProps;
+//module.exports.testGetUA = testGetUA;
+ module.exports.testWriteAppJson = testWriteAppJson;
+  //module.exports.testAddTargetHook = testAddTargetHook;
 
-/**
- * Git Stuff 
- */
-module.exports.tesGitClone = tesGitClone;
-module.exports.testGitCheckout = testGitCheckout;
-module.exports.testGitGetBranches = testGitGetBranches;
-module.exports.testGetBestBranch = testGetBestBranch;
 
-/*
- * Installer
- */
-module.exports.testInstall = testInstall;
+// /**
+//  * Git Stuff 
+//  */
+// module.exports.tesGitClone = tesGitClone;
+// module.exports.testGitCheckout = testGitCheckout;
+// module.exports.testGitGetBranches = testGitGetBranches;
+// module.exports.testGetBestBranch = testGetBestBranch;
+
+// /*
+//  * Installer
+//  */
+// module.exports.testInstall = testInstall;
