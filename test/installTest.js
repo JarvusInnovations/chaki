@@ -391,7 +391,7 @@ testWriteAppJson = function (test) {
   });
 
     test.ok(chaki.updateAppJson({packageName : "test-package-name"}));
-
+    var appJson = fs.readFileSync(chaki.getAppJsonPath(), 'utf8');
     // use injection to invalidate json and test for fail
    // test.ok(!chaki.updateAppJson({packageName : "test-package-name\",,"}));
     test.done();

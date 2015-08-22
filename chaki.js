@@ -144,8 +144,8 @@ app.updateAppJson = function (opts) {
     var regex = /"requires"\s*:\s*\[([^\]\*]+)\]/;
     var appJson = fs.readFileSync(app.getAppJsonPath(), 'utf8');
     var match = app.getAppJsonRequires(appJson);
-    var update = match.substring(0, match.length - 2);
-    update += ', \"' + opts.packageName + '\"]';
+    var update = match.substring(0, match.length - 2).trim();
+    update += ',\n        \"' + opts.packageName + '\"\n]';
     appJson = appJson.replace(regex, update);
 
     // make sure we're left with a valid json obj
@@ -158,7 +158,7 @@ app.updateAppJson = function (opts) {
             just installed.");
         return false;
     }
-    console.log("UAJ1", opts, match, update, appJson);    
+    console.log("UAJ1", update, appJson);    
 };
 
 // ensure that when stripped of comments that
