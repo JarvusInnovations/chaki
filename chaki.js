@@ -71,6 +71,28 @@ app.cmd('get-ua-string', function () {
     app.log.info(app.getUserAgent());
 });
 
+app.cmd('update', function () {
+    var opts = {},
+        Update = require(__dirname + '/lib/update'),
+        cmdProperties = _loadCmdProperties();
+
+        opts.workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+        opts.app = app;
+        Update.updateAll(opts);
+});
+
+// @@TODO we might need to know which branch we're f-ing with
+app.cmd('update :package', function (packageName) {
+    var opts = {},
+        Update = require(__dirname + '/lib/update'),
+        cmdProperties = _loadCmdProperties();
+
+        opts.workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+        opts.packageName = packageName;
+        opts.app = app;
+
+        Update.updateRequested(opts);
+});
 /**
  * GETTERS
  **/
