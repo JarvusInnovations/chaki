@@ -51,6 +51,10 @@ app.cmd('install', function () {
 
 app.cmd('install :package', function (package) {
     app.log.info('Installing ' + package + ' ...');
+    var cmdProperties = _loadCmdProperties();
+    var Install = require(__dirname + '/lib/install');
+    app.workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
+    Install.installSinglePackage({app: app, packageName : package, method : 'api'});
 });
 
 app.cmd('dump-cmd-props', function () {
@@ -145,7 +149,7 @@ app.updateAppJson = function (opts) {
     var appJson = fs.readFileSync(app.getAppJsonPath(), 'utf8');
     var match = app.getAppJsonRequires(appJson);
     var update = match.substring(0, match.length - 2).trim();
-    update += ',\n        \"' + opts.packageName + '\"\n]';
+    update += ',\n        \"' + opts.packageName + '\"\n    ]';
     appJson = appJson.replace(regex, update);
 
     // make sure we're left with a valid json obj
@@ -158,7 +162,6 @@ app.updateAppJson = function (opts) {
             just installed.");
         return false;
     }
-    console.log("UAJ1", update, appJson);    
 };
 
 // ensure that when stripped of comments that
@@ -173,21 +176,19 @@ app.checkUpdateAppJson = function (appJson) {
     }
 };
 
-
-// <target name=“-before-build”>
-//     <exec executable=“chaki”>
-//         <arg value=“update” />
-//     </exec>
-// </target>
-
-//insert it before `</project>`
-
 app.addTargetHook = function () {
-    var parser = new xml2js.Parser();
-    var xml = fs.readFileSync(_getBuildXMLPath(), 'utf8');
-    var obj = xml2js.parseString(xml, function (err, result) {
-        console.json(result);
-    });
+    var xml, targetHook, idx, spliced, newNode;
+    targetHook =  "\n    <target name=“-before-build”>\n";
+    targetHook += "          <exec executable=“chaki”>\n";
+    targetHook += "             <arg value=“update” />\n";
+    targetHook += "          </exec>\n";
+    targetHook += "    </target>\n";
+
+    xml = fs.readFileSync(_getBuildXMLPath(), "utf8");
+    idx = xml.indexOf('</project>');
+
+    spliced = xml.slice(0, idx).trim() + targetHook + "</project>";
+    console.log(xml,idx,spliced);
 };
 
 /**

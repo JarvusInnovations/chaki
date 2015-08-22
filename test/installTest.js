@@ -199,6 +199,11 @@ var testInstall = function (test) {
   });
 };
 
+testInstallSingle = function (test) {
+    
+    test.done();
+};
+
 var testGetPackageInstallPath = function (test) {
   var testWritten = false;
   test.ok(testWritten === true, "Write testGetPackageInstallPath");
@@ -440,8 +445,8 @@ module.exports.tearDown = function (cb) {
 // module.exports.testCmdAppProps = testGetCmdProps;
 // module.exports.testGetAppProps = testGetAppProps;
 //module.exports.testGetUA = testGetUA;
- module.exports.testWriteAppJson = testWriteAppJson;
-  //module.exports.testAddTargetHook = testAddTargetHook;
+// module.exports.testWriteAppJson = testWriteAppJson;
+module.exports.testAddTargetHook = testAddTargetHook;
 
 
 // /**
@@ -456,3 +461,4 @@ module.exports.tearDown = function (cb) {
 //  * Installer
 //  */
 // module.exports.testInstall = testInstall;
+// module.exports.testInstallSingle = testInstallSingle;
