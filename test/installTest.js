@@ -387,6 +387,7 @@ testGetBestBranch = function (test) {
   test.done();
 };
 
+// @@TODO we need to reset appJson values before testing
 testWriteAppJson = function (test) {
   chaki.extend({
     command : "test",
@@ -402,12 +403,15 @@ testWriteAppJson = function (test) {
     test.done();
 };
 
+
+// @@TODO - we need to reset build.xml values before testing
 testAddTargetHook = function (test) {
   chaki.extend({
     args : {
       app : testModulePath
     }
   });
+  var before = fs.readFileSync(chaki.getBuildXMLPath(), 'utf8');
   chaki.addTargetHook();
   test.done();
 };

@@ -123,6 +123,10 @@ app.getModuleProps = function (path, props) {
     return _loadAppProperties(path, props);
 };
 
+app.getBuildXMLPath = function () {
+    return _getBuildXMLPath();
+},
+
 // get requires array from app.json
 app.getAppJsonRequires = function (appJson) {
     var regex = /"requires"\s*:\s*\[([^\]\*]+)\]/;
@@ -135,15 +139,6 @@ app.getAppJsonRequires = function (appJson) {
  * SETTERS
  **/
 
-// here this one will give you an additional match set that gives you what you should prefix 
-// your addition with to indent consistently:
-// /"requires"\s*:\s*\[(\s*)([^\]\*]+)\]/
-// so glue `,$1”packgae-name”` to the end of $2
-
-// make sure there's 1 and only 1 match
-// append package name
-// replace
-// write
 app.updateAppJson = function (opts) {
     var regex = /"requires"\s*:\s*\[([^\]\*]+)\]/;
     var appJson = fs.readFileSync(app.getAppJsonPath(), 'utf8');
@@ -178,17 +173,26 @@ app.checkUpdateAppJson = function (appJson) {
 
 app.addTargetHook = function () {
     var xml, targetHook, idx, spliced, newNode;
-    targetHook =  "\n    <target name=“-before-build”>\n";
-    targetHook += "          <exec executable=“chaki”>\n";
-    targetHook += "             <arg value=“update” />\n";
-    targetHook += "          </exec>\n";
-    targetHook += "    </target>\n";
-
     xml = fs.readFileSync(_getBuildXMLPath(), "utf8");
-    idx = xml.indexOf('</project>');
+    console.log("AAA", (xml.indexOf('chaki') >= 0));
 
-    spliced = xml.slice(0, idx).trim() + targetHook + "</project>";
-    console.log(xml,idx,spliced);
+    // look see if it's already in
+    if (xml.indexOf('chaki') < 0) {
+        app.log.info("Adding Chaki build target hook to build.xml...");
+        targetHook =  "\n    <target name=“-before-build”>\n";
+        targetHook += "          <exec executable=“chaki”>\n";
+        targetHook += "             <arg value=“update” />\n";
+        targetHook += "          </exec>\n";
+        targetHook += "    </target>\n";
+
+        idx = xml.indexOf('</project>');
+
+        spliced = xml.slice(0, idx).trim() + targetHook + "</project>";
+        console.log(xml,idx,spliced);
+        xml = fs.writeFileSync(_getBuildXMLPath(), spliced);
+    } else {
+        console.log("Target hook already added");
+    }
 };
 
 /**
