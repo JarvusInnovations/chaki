@@ -54,7 +54,7 @@ app.cmd('install :package', function (package) {
     var cmdProperties = _loadCmdProperties();
     var Install = require(__dirname + '/lib/install');
     app.workspacePackagesPath = _getWorkspacePackagesPath(cmdProperties);
-    Install.installSinglePackage({app: app, packageName : package, method : 'api'});
+    Install.installPackages({app: app, requestedPackage : package, method : 'api'});
 });
 
 app.cmd('dump-cmd-props', function () {
@@ -99,7 +99,9 @@ app.getNpmData = function (props) {
 app.getUserAgent = function () {
     var ver = app.getNpmData('version').version;
     var sen = app.getSenchaInfo();
-    var hash = sha1(sen['app.framework.version']);
+    var appId = app.getAppProps(['id']).id;
+    console.log("appId", appId);
+    var hash = sha1(appId);
     var ua = "Chaki/"+ver+" ("+ sen['app.framework']+'/'+sen['app.framework.version']+'; app/'+hash+')';
     return(ua);
 };
@@ -144,12 +146,12 @@ app.updateAppJson = function (opts) {
     var appJson = fs.readFileSync(app.getAppJsonPath(), 'utf8');
     var match = app.getAppJsonRequires(appJson);
     var update = match.substring(0, match.length - 2).trim();
-    update += ',\n        \"' + opts.packageName + '\"\n    ]';
+    update += ',\n        "' + opts.packageName + '"\n    ]';
     appJson = appJson.replace(regex, update);
 
     // make sure we're left with a valid json obj
     if (app.checkUpdateAppJson(appJson)) {
-        fs.writeFileSync(app.getAppJsonPath(), appJson);
+        fs.writeFileSync(app.getAppJsonPath(), appJson, encoding="utf8");
         return true;
     } else {
         console.error("There was a problem updating the app.json configuration\
@@ -179,17 +181,17 @@ app.addTargetHook = function () {
     // look see if it's already in
     if (xml.indexOf('chaki') < 0) {
         app.log.info("Adding Chaki build target hook to build.xml...");
-        targetHook =  "\n    <target name=“-before-build”>\n";
-        targetHook += "          <exec executable=“chaki”>\n";
-        targetHook += "             <arg value=“update” />\n";
-        targetHook += "          </exec>\n";
-        targetHook += "    </target>\n";
+        targetHook =  '\n    <target name="-before-build">\n';
+        targetHook += '          <exec executable="chaki">\n';
+        targetHook += '             <arg value="update" />\n';
+        targetHook += '          </exec>\n';
+        targetHook += '    </target>\n';
 
         idx = xml.indexOf('</project>');
 
         spliced = xml.slice(0, idx).trim() + targetHook + "</project>";
-        console.log(xml,idx,spliced);
-        xml = fs.writeFileSync(_getBuildXMLPath(), spliced);
+        console.log('...',spliced);
+        fs.writeFileSync(_getBuildXMLPath(), spliced);
     } else {
         console.log("Target hook already added");
     }
@@ -199,7 +201,9 @@ app.addTargetHook = function () {
  * PRIVATES
  **/
 _getBuildXMLPath = function () {
-    return (app.args.app) ? path.resolve(__dirname, app.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), './build.xml');
+    var out =  (app.args.app) ? path.resolve(__dirname, app.args.app, './build.xml') : path.resolve(path.resolve(process.cwd()), 'build.xml');
+    console.log(out);
+    return out;
 };
 
 _loadAppProperties = function (appJsonPath, props) {
