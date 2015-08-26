@@ -1,6 +1,6 @@
 {
   "name": "chaki",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "A community package manager for Sencha frameworks",
   "repository": {
     "type": "git",
