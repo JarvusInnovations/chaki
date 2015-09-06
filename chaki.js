@@ -8,7 +8,6 @@ var flatiron = require('flatiron'),
     path = require('path'),
     prettyjson = require('prettyjson').render;
     Install = require(__dirname + '/lib/install'),
-    xml2js = require('xml2js'),
     _ = require('underscore'),
     strip = require('strip-comments');
 

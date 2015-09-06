@@ -5,7 +5,11 @@ var path = require('path'),
     fs = require('fs'),
     testModulePath = __dirname + '/testApp/sencha-workspace/SlateAdmin/',
     testGithubAcct = "starsinmypockets",
+    testAppGitPath = "git@github.com:starsinmypockets/chaki-test-app.git",
     chaki,
+    Git = require(__dirname + '/../lib/git'),
+    initDone = false,
+    finalTearDown,
     x=0;
 
 // report uncaught exceptions please
@@ -419,6 +423,15 @@ testAddTargetHook = function (test) {
 /**
  * SETUP
  */
+
+_doInit = function () {
+  console.log('Installing test application');
+  Git.gitCloneRepo({
+    path: testAppGitPath,
+    dest: __dirname + "/testApp/"
+  });
+}
+
 module.exports.setUp = function (cb) {
  shell.cd(path.resolve(__dirname, '..'));
  console.log(process.cwd());
@@ -426,6 +439,10 @@ module.exports.setUp = function (cb) {
   chaki.args = {};
   x++;
   console.log("TEST " + x, chaki.args);
+  if (initDone === false) {
+    _doInit();
+    initDone = true;
+  }
   cb();
 };
 
@@ -450,7 +467,7 @@ module.exports.testCmdAppProps = testGetCmdProps;
 module.exports.testGetAppProps = testGetAppProps;
 module.exports.testGetUA = testGetUA;
 module.exports.testWriteAppJson = testWriteAppJson;
- module.exports.testAddTargetHook = testAddTargetHook;
+module.exports.testAddTargetHook = testAddTargetHook;
 
 
 // /**
