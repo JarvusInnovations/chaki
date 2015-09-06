@@ -430,7 +430,7 @@ _doInit = function () {
     path: testAppGitPath,
     dest: __dirname + "/testApp/"
   });
-}
+};
 
 module.exports.setUp = function (cb) {
  shell.cd(path.resolve(__dirname, '..'));
